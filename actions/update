@@ -4,4 +4,4 @@ set -e
 
 cd /opt/cloud-benchmarks
 git pull
-service cloudbenchmarks restart
+python $CHARM_DIR/hooks/hooks.py
