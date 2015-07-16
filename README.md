@@ -33,3 +33,10 @@ Github url from which to pull the webapp source code:
 The port on which to serve the website:
 
     juju set cloud-benchmarks port=6542
+
+# Actions
+
+The `update` action pulls the latest app source from Github and restarts
+the service.
+
+    juju action do cloud-benchmarks/0 update

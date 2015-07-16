@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+cd /opt/cloud-benchmarks
+git pull
+service cloudbenchmarks restart
