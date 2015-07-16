@@ -67,7 +67,7 @@ def install():
             close_port(config.previous('port'))
 
 
-@when('http.available')
+@when('website.available')
 def configure_website(http):
     http.configure(unit_private_ip(), config['port'])
 
