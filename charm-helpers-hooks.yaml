@@ -1,0 +1,7 @@
+branch: http://bazaar.launchpad.net/~johnsca/charm-helpers/reactive
+destination: hooks/charmhelpers
+include:
+    - core
+    - cli
+    - fetch
+    - contrib.network

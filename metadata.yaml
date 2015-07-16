@@ -1,0 +1,15 @@
+name: cloud-benchmarks
+maintainers:
+  - Marco Ceppi <marco.ceppi@canonical.com>
+  - Tim Van Steenburgh <tim.van.steenburgh@canonical.com>
+  - Adam Israel <adam.israel@canonical.com>
+summary: "cloud-benchmarks.org web app"
+description: "cloud-benchmarks.org web app"
+tags:
+  - misc
+provides:
+  website:
+    interface: http
+requires:
+  db:
+    interface: pgsql
