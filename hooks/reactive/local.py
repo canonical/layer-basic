@@ -16,10 +16,9 @@ from charmhelpers.core.host import service_restart
 from charmhelpers.core.host import service_stop
 
 from charmhelpers.core.reactive import hook
-from charmhelpers.core.reactive import remove_state
-from charmhelpers.core.reactive import set_state
 from charmhelpers.core.reactive import when
 from charmhelpers.core.reactive import when_not
+from charmhelpers.core.reactive import when_file_changed
 
 from charmhelpers.core.unitdata import kv
 
@@ -35,7 +34,8 @@ DB_ROLE = 'cbo'
 APT_PKGS = ('make',)
 
 APP_DIR = '/opt/cloud-benchmarks'
-APP_INI = os.path.join(APP_DIR, 'production.ini')
+APP_INI_SRC = os.path.join(APP_DIR, 'production.ini')
+APP_INI_DEST = '/etc/cloudbenchmarks.ini'
 APP_USER = 'ubuntu'
 APP_GROUP = 'ubuntu'
 
@@ -82,7 +82,8 @@ def render_ini(pgsql):
         pgsql.database(),
     )
 
-    with open(APP_INI, 'r+') as f:
+    ini = ''
+    with open(APP_INI_SRC, 'r') as f:
         ini = f.read()
         ini = re.sub(
             r'(sqlalchemy.url\s*=)(.*)',
@@ -90,21 +91,19 @@ def render_ini(pgsql):
         ini = re.sub(
             r'(port\s*=)(.*)',
             r'\1 ' + str(config['port']), ini)
-        f.seek(0, 0)
-        f.truncate()
-        f.write(ini)
 
-    set_state('app-ready')
+    with open(APP_INI_DEST, 'w') as f:
+        f.write(ini)
+    chownr(APP_INI_DEST, APP_USER, APP_GROUP)
 
 
 @when_not('db.database.available')
 def stop_service():
-    remove_state('app-ready')
     service_stop(SERVICE)
     status_set('waiting', 'Waiting for database')
 
 
-@when('app-ready')
+@when_file_changed(APP_INI_DEST)
 def restart_service():
     service_restart(SERVICE)
     status_set('active', 'Serving on port {port}'.format(**config))
