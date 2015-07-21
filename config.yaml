@@ -1,7 +1,7 @@
 options:
   repo:
     type: string
-    default: https://github.com/juju-solutions/cloud-benchmarks.org.git
+    default: https://github.com/cloud-benchmarks/cloud-benchmarks.org.git
     description: |
       The git url from which to clone the cloud-benchmarks application.
   port:
