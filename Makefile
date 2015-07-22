@@ -7,7 +7,7 @@ lint:
 
 unit_test:
 	@echo Starting tests...
-	@$(PYTHON) /usr/bin/nosetests --nologcapture unit_tests
+	tox
 
 test:
 	@echo Starting Amulet tests...
