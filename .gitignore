@@ -1,4 +1,6 @@
 *.pyc
 *~
 .ropeproject
+.settings
 .tox
+bin
