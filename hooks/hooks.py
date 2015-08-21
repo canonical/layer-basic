@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
-import charmhelpers.core.reactive as reactive
+import charms.reactive as reactive
+
 
 reactive.main()
