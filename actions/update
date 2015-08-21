@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -e
-
-cd /opt/cloud-benchmarks
-git pull
-python $CHARM_DIR/hooks/hooks.py
