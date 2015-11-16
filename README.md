@@ -48,4 +48,4 @@ This layer currently does not define any actions.
 [interfaces.juju.solutions]: http://interfaces.juju.solutions/
 [non-python]: https://pythonhosted.org/charms.reactive/#non-python-reactive-handlers
 [external handler protocol]: https://pythonhosted.org/charms.reactive/charms.reactive.bus.html#charms.reactive.bus.ExternalHandler
-[PyPI]: https://pypi.python.org/pypi?%3Aaction=search&term=charms.&submit=search
+[pypi charms.X]: https://pypi.python.org/pypi?%3Aaction=search&term=charms.&submit=search
