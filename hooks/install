@@ -11,7 +11,7 @@ sys.path.append('lib')
 
 # bootstrap wheelhouse
 if os.path.exists('wheelhouse'):
-    check_call(['pip', 'install', '--no-index', glob('wheelhouse/*')])
+    check_call(['pip', 'install', '--no-index'] + glob('wheelhouse/*'))
 
 
 # This will load and run the appropriate @hook and other decorated
