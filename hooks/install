@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from glob import glob
 import os
@@ -11,11 +11,11 @@ sys.path.append('lib')
 
 # bootstrap wheelhouse
 if os.path.exists('wheelhouse'):
-    check_call(['apt-get', 'install', '-yq', 'python-pip'])
+    check_call(['apt-get', 'install', '-yq', 'python3-pip'])
     # need newer pip, to fix spurious Double Requirement error https://github.com/pypa/pip/issues/56
-    check_call(['pip', 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
+    check_call(['pip3', 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
     # install the rest of the wheelhouse deps
-    check_call(['pip', 'install', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
+    check_call(['pip3', 'install', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
 
 
 # This will load and run the appropriate @hook and other decorated
