@@ -1,11 +1,10 @@
 # Overview
 
 This is the base layer for all charms [built using layers][building].  It
-provides all of the standard hooks, such as ``install``, ``config-changed``,
-``upgrade-charm``, etc. and runs the [charms.reactive.main][charms.reactive]
-loop for them.  It also bootstraps the [charm-helpers][] and [charms.reactive][]
-libraries and all of their dependencies for use by the charm.
-
+provides all of the standard Juju hooks and runs the
+[charms.reactive.main][charms.reactive] loop for them.  It also bootstraps the
+[charm-helpers][] and [charms.reactive][] libraries and all of their
+dependencies for use by the charm.
 
 # Usage
 
@@ -26,6 +25,18 @@ You can also define Python libraries under ``lib/charms/X`` where ``X`` is a
 package under the ``charms.`` namespace for your charm.  See [PyPI][pypi charms.X]
 for what packages already exist under the ``charms.`` namespace.
 
+# Hooks
+
+This layer provides hooks that other layers can react to using the decorators
+of the [charms.reactive][] library
+* ``config-changed``
+* ``install``
+* ``start``
+* ``stop``
+* ``upgrade-charm``
+
+Other hooks are not implemented at this time. A new layer can implement storage
+or relation hooks in their own layer by putting them in the ``hooks`` directory.
 
 # Layer Configuration
 
