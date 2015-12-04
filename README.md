@@ -11,9 +11,9 @@ dependencies for use by the charm.
 To create a charm layer using this base layer, you need only include it in
 a `layer.yaml` file:
 
-``yaml
+```yaml
 includes: ['layer:basic']
-``
+```
 
 This will fetch this layer from [interfaces.juju.solutions][] and incorporate
 it into your charm layer.  You can then add handlers under the `reactive/`
@@ -28,15 +28,16 @@ for what packages already exist under the `charms.` namespace.
 # Hooks
 
 This layer provides hooks that other layers can react to using the decorators
-of the [charms.reactive][] library
-* `config-changed`
-* `install`
-* `leader-elected`
-* `leader-settings-changed`
-* `start`
-* `stop`
-* `upgrade-charm`
-* `update-status`
+of the [charms.reactive][] library:
+
+  * `config-changed`
+  * `install`
+  * `leader-elected`
+  * `leader-settings-changed`
+  * `start`
+  * `stop`
+  * `upgrade-charm`
+  * `update-status`
 
 Other hooks are not implemented at this time. A new layer can implement storage
 or relation hooks in their own layer by putting them in the `hooks` directory.
