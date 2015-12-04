@@ -31,6 +31,8 @@ This layer provides hooks that other layers can react to using the decorators
 of the [charms.reactive][] library
 * ``config-changed``
 * ``install``
+* ``leader-elected``
+* ``leader-settings-changed``
 * ``start``
 * ``stop``
 * ``upgrade-charm``
