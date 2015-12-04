@@ -15,7 +15,7 @@ if os.path.exists('wheelhouse'):
     # need newer pip, to fix spurious Double Requirement error https://github.com/pypa/pip/issues/56
     check_call(['pip', 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
     # install the rest of the wheelhouse deps
-    check_call(['pip', 'install', '-U', '--no-index'] + glob('wheelhouse/*'))
+    check_call(['pip', 'install', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
 
 
 # This will load and run the appropriate @hook and other decorated
