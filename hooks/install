@@ -11,7 +11,7 @@ sys.path.append('lib')
 
 # bootstrap wheelhouse
 if os.path.exists('wheelhouse'):
-    check_call(['apt-get', 'install', '-yq', 'python3-pip'])
+    check_call(['apt-get', 'install', '-yq', 'python3-pip', '--no-install-recommends'])
     # need newer pip, to fix spurious Double Requirement error https://github.com/pypa/pip/issues/56
     check_call(['pip3', 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
     # install the rest of the wheelhouse deps
