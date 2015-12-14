@@ -4,6 +4,10 @@
 import sys
 sys.path.append('lib')
 
+from charms.bootstrap import bootstrap_charm_deps
+bootstrap_charm_deps()
+
+
 # This will load and run the appropriate @hook and other decorated
 # handlers from $CHARM_DIR/reactive, $CHARM_DIR/hooks/reactive,
 # and $CHARM_DIR/hooks/relations.
