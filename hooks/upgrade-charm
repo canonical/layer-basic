@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
 # Load modules from $CHARM_DIR/lib
+import os
 import sys
 sys.path.append('lib')
+
+# This is an upgrade-charm context, make sure we install latest deps
+os.unlink('wheelhouse/.bootstrapped')
 
 from charms.bootstrap import bootstrap_charm_deps
 bootstrap_charm_deps()
