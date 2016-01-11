@@ -1,0 +1,5 @@
+defines:
+  packages:
+    type: array
+    description: Additional packages to be installed at time of bootstrap
+
