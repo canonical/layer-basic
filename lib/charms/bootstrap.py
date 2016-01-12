@@ -33,7 +33,7 @@ def install_charm_deps():
 
 
 def apt_install(packages):
-    if isinstance(packages, basestring):
+    if isinstance(packages, (str, bytes)):
         packages = [packages]
 
     env = os.environ.copy()
