@@ -6,7 +6,12 @@ import sys
 sys.path.append('lib')
 
 # This is an upgrade-charm context, make sure we install latest deps
-os.unlink('wheelhouse/.bootstrapped')
+if not os.path.exists('wheelhouse/.upgrade'):
+    open('wheelhouse/.upgrade', 'w').close()
+    if os.path.exists('wheelhouse/.bootstrapped'):
+        os.unlink('wheelhouse/.bootstrapped')
+else:
+    os.unlink('wheelhouse/.upgrade')
 
 from charms.bootstrap import bootstrap_charm_deps
 bootstrap_charm_deps()
