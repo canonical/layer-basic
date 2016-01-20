@@ -13,9 +13,9 @@ def bootstrap_charm_deps():
         # install packages defined in layer.yaml
         install_charm_deps()
         # need newer pip, to fix spurious Double Requirement error https://github.com/pypa/pip/issues/56
-        check_call(['pip3', 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
+        check_call(['pip3', 'install', '--ignore-installed', 'six', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
         # install the rest of the wheelhouse deps
-        check_call(['pip3', 'install', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
+        check_call(['pip3', 'install', '--ignore-installed', 'six', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
         # flag us as having already bootstrapped so we don't do it again
         open('wheelhouse/.bootstrapped', 'w').close()
         # Ensure that the newly bootstrapped libs are available.
