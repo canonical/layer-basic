@@ -13,7 +13,7 @@ def bootstrap_charm_deps():
     if os.path.exists('wheelhouse/.bootstrapped'):
         from charms import layer
         cfg = layer.options('basic')
-        if cfg['use_venv'] and '.venv' not in sys.executable:
+        if cfg.get('use_venv') and '.venv' not in sys.executable:
             # activate the venv
             os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
             reload_interpreter(vpy)
@@ -24,12 +24,12 @@ def bootstrap_charm_deps():
         from charms import layer
         cfg = layer.options('basic')
         # include packages defined in layer.yaml
-        apt_install(cfg['packages'])
+        apt_install(cfg.get('packages', []))
         # if we're using a venv, set it up
-        if cfg['use_venv']:
+        if cfg.get('use_venv'):
             apt_install(['python-virtualenv'])
             cmd = ['virtualenv', '--python=python3', venv]
-            if cfg['include_system_packages']:
+            if cfg.get('include_system_packages'):
                 cmd.append('--system-site-packages')
             check_call(cmd)
             os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
@@ -43,7 +43,7 @@ def bootstrap_charm_deps():
         check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
         # install the rest of the wheelhouse deps
         check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
-        if not cfg['use_venv']:
+        if not cfg.get('use_venv'):
             # restore system pip to prevent `pip3 install -U pip` from changing it
             if os.path.exists('/usr/bin/pip.save'):
                 shutil.copy2('/usr/bin/pip.save', '/usr/bin/pip')
@@ -54,7 +54,7 @@ def bootstrap_charm_deps():
         # Note: this only seems to be an issue with namespace packages.
         # Non-namespace-package libs (e.g., charmhelpers) are available
         # without having to reload the interpreter. :/
-        reload_interpreter(vpy if cfg['use_venv'] else sys.argv[0])
+        reload_interpreter(vpy if cfg.get('use_venv') else sys.argv[0])
 
 
 def reload_interpreter(python):
