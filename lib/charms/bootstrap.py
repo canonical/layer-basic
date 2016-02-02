@@ -3,8 +3,16 @@ import sys
 from glob import glob
 from subprocess import check_call
 
+from charms.execd import execd_preinstall
+
 
 def bootstrap_charm_deps():
+    # execd must happen first, before any attempt to install packages or
+    # access the network, because sites use this hook to do bespoke
+    # configuration and install secrets so the rest of this bootstrap
+    # and the charm itself can actually succeed. This call does nothing
+    # unless the operator has created and populated $CHARM_DIR/exec.d.
+    execd_preinstall()
     if os.path.exists('wheelhouse/.bootstrapped'):
         return
     # bootstrap wheelhouse
