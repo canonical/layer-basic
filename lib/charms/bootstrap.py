@@ -4,6 +4,8 @@ import shutil
 from glob import glob
 from subprocess import check_call
 
+class DistributionNotSupported(Exception):
+    pass
 
 def bootstrap_charm_deps():
     """
@@ -23,14 +25,14 @@ def bootstrap_charm_deps():
         return
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
-        apt_install(['python3-pip', 'python3-yaml'])
+        package_install(['python3-pip', 'python3-yaml'])
         from charms import layer
         cfg = layer.options('basic')
         # include packages defined in layer.yaml
-        apt_install(cfg.get('packages', []))
+        package_install(cfg.get('packages', []))
         # if we're using a venv, set it up
         if cfg.get('use_venv'):
-            apt_install(['python-virtualenv'])
+            package_install(['python-virtualenv'])
             cmd = ['virtualenv', '--python=python3', venv]
             if cfg.get('include_system_packages'):
                 cmd.append('--system-site-packages')
@@ -69,10 +71,9 @@ def reload_interpreter(python):
     """
     os.execle(python, python, sys.argv[0], os.environ)
 
-
-def apt_install(packages):
+def package_install(packages):
     """
-    Install apt packages.
+    Install apt/yum packages.
 
     This ensures a consistent set of options that are often missed but
     should really be set.
@@ -82,11 +83,21 @@ def apt_install(packages):
 
     env = os.environ.copy()
 
-    if 'DEBIAN_FRONTEND' not in env:
-        env['DEBIAN_FRONTEND'] = 'noninteractive'
+    distro = platform.linux_distribution()[0]
+    if "Ubuntu" in distro:
+        if 'DEBIAN_FRONTEND' not in env:
+            env['DEBIAN_FRONTEND'] = 'noninteractive'
 
-    cmd = ['apt-get',
-           '--option=Dpkg::Options::=--force-confold',
-           '--assume-yes',
-           'install']
+        cmd = ['apt-get',
+            '--option=Dpkg::Options::=--force-confold',
+            '--assume-yes',
+            'install']
+    elif "CentOS" in distro:
+        cmd = ['yum',
+            '--assumeyes',
+            '--debuglevel=1'
+            'install']
+    else:
+        raise DistributionNotSupported
+
     check_call(cmd + packages, env=env)
