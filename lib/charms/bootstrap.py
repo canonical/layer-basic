@@ -6,6 +6,9 @@ from subprocess import check_call
 
 
 def bootstrap_charm_deps():
+    """
+    Set up the base charm dependencies so that the reactive system can run.
+    """
     venv = os.path.abspath('../.venv')
     vbin = os.path.join(venv, 'bin')
     vpip = os.path.join(vbin, 'pip')
@@ -58,10 +61,22 @@ def bootstrap_charm_deps():
 
 
 def reload_interpreter(python):
+    """
+    Reload the python interpreter to ensure that all deps are available.
+
+    Newly installed modules in namespace packages sometimes seemt to
+    not be picked up by Python 3.
+    """
     os.execle(python, python, sys.argv[0], os.environ)
 
 
 def apt_install(packages):
+    """
+    Install apt packages.
+
+    This ensures a consistent set of options that are often missed but
+    should really be set.
+    """
     if isinstance(packages, (str, bytes)):
         packages = [packages]
 
