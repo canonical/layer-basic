@@ -1,10 +1,9 @@
-
 import os
-import yaml
 
 
 class LayerOptions(dict):
     def __init__(self, layer_file, section=None):
+        import yaml  # defer, might not be available until bootstrap
         with open(layer_file) as f:
             layer = yaml.safe_load(f.read())
         opts = layer.get('options', {})
