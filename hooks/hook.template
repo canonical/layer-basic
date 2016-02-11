@@ -4,7 +4,7 @@
 import sys
 sys.path.append('lib')
 
-from charms.bootstrap import bootstrap_charm_deps
+from charms.layer.basic import bootstrap_charm_deps
 bootstrap_charm_deps()
 
 

@@ -13,7 +13,7 @@ if not os.path.exists('wheelhouse/.upgrade'):
 else:
     os.unlink('wheelhouse/.upgrade')
 
-from charms.bootstrap import bootstrap_charm_deps
+from charms.layer.basic import bootstrap_charm_deps
 bootstrap_charm_deps()
 
 

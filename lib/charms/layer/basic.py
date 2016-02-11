@@ -30,11 +30,12 @@ def bootstrap_charm_deps():
         apt_install(cfg.get('packages', []))
         # if we're using a venv, set it up
         if cfg.get('use_venv'):
-            apt_install(['python-virtualenv'])
-            cmd = ['virtualenv', '--python=python3', venv]
-            if cfg.get('include_system_packages'):
-                cmd.append('--system-site-packages')
-            check_call(cmd)
+            if not os.path.exists(venv):
+                apt_install(['python-virtualenv'])
+                cmd = ['virtualenv', '--python=python3', venv]
+                if cfg.get('include_system_packages'):
+                    cmd.append('--system-site-packages')
+                check_call(cmd)
             os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
             pip = vpip
         else:
