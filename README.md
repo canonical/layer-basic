@@ -82,7 +82,7 @@ A layer using `foo` could then set it:
 ```yaml
 includes: ['layer:foo']
 options:
-  foo:  # set an option for the "foo" layer
+  foo:  # setting options for the "foo" layer
     enable-bar: true  # set the "enable-bar" option to true
 ```
 
