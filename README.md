@@ -70,8 +70,8 @@ For example, the `foo` layer could include the following option definitons:
 
 ```yaml
 includes: ['layer:basic']
-defines:
-  enable-bar:
+defines:  # define some options for this layer (the layer "foo")
+  enable-bar:  # define an "enable-bar" option for this layer
     description: If true, enable support for "bar".
     type: boolean
     default: false
@@ -82,8 +82,8 @@ A layer using `foo` could then set it:
 ```yaml
 includes: ['layer:foo']
 options:
-  foo:
-    enable-bar: true
+  foo:  # set an option for the "foo" layer
+    enable-bar: true  # set the "enable-bar" option to true
 ```
 
 The `foo` layer can then use the `charms.layer.options` helper to load the values
@@ -94,8 +94,8 @@ from charms import layer
 
 @when('state')
 def do_thing():
-  layer_opts = layer.options('foo')
-  if layer_opts['enable-bar']:
+  layer_opts = layer.options('foo')  # load all of the options for the "foo" layer
+  if layer_opts['enable-bar']:  # check the value of the "enable-bar" option
       hookenv.log("Bar is enabled")
 ```
 
