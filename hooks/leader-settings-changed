@@ -4,7 +4,7 @@
 import sys
 sys.path.append('lib')
 
-from charms.bootstrap import bootstrap_charm_deps
+from charms.layer.basic import bootstrap_charm_deps
 bootstrap_charm_deps()
 
 
@@ -12,7 +12,7 @@ bootstrap_charm_deps()
 # handlers from $CHARM_DIR/reactive, $CHARM_DIR/hooks/reactive,
 # and $CHARM_DIR/hooks/relations.
 #
-# See https://jujucharms.com/docs/stable/getting-started-with-charms-reactive
+# See https://jujucharms.com/docs/stable/authors-charm-building
 # for more information on this pattern.
 from charms.reactive import main
 main()
