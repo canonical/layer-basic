@@ -13,8 +13,9 @@ if not os.path.exists('wheelhouse/.upgrade'):
 else:
     os.unlink('wheelhouse/.upgrade')
 
-from charms.layer.basic import bootstrap_charm_deps
-bootstrap_charm_deps()
+from charms.layer import basic
+basic.bootstrap_charm_deps()
+basic.init_config_states()
 
 
 # This will load and run the appropriate @hook and other decorated
