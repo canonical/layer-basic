@@ -91,3 +91,24 @@ def apt_install(packages):
            '--assume-yes',
            'install']
     check_call(cmd + packages, env=env)
+
+
+def init_config_states():
+    from charmhelpers.core import hookenv
+    from charms.reactive import set_state
+    config = hookenv.config()
+    for opt in config.keys():
+        if config.changed(opt):
+            set_state('config.changed')
+            set_state('config.changed.{}'.format(opt))
+    hookenv.atexit(clear_config_states)
+
+
+def clear_config_states():
+    from charmhelpers.core import hookenv, unitdata
+    from charms.reactive import remove_state
+    config = hookenv.config()
+    remove_state('config.changed')
+    for opt in config.keys():
+        remove_state('config.changed.{}'.format(opt))
+    unitdata.kv().flush()

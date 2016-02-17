@@ -153,7 +153,23 @@ options:
 
 # Reactive States
 
-This layer currently does not set any reactive states.
+This layer will set the following states:
+
+  * **`config.changed`**  Any config option has changed from its previous value.
+    This state is cleared automatically at the end of each hook invocation.
+
+  * **`config.changed.<option>`** A specific config option has changed.
+    **`<option>`** will be replaced by the config option name from `config.yaml`.
+    This state is cleared automatically at the end of each hook invocation.
+
+An example using the config states would be:
+
+```python
+@when('config.changed.my-opt')
+def my_opt_changed():
+    update_config()
+    restart_service()
+```
 
 
 # Actions
