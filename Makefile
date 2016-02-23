@@ -8,7 +8,7 @@ build: unit_test
 	juju-compose -o ~/charms .
 
 lint:
-	@flake8 --exclude hooks/charmhelpers hooks unit_tests tests
+	@flake8 $(wildcard hooks unit_tests tests)
 	@charm proof
 
 unit_test:
