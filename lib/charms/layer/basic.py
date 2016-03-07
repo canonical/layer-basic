@@ -93,12 +93,12 @@ def apt_install(packages):
     check_call(cmd + packages, env=env)
 
 
-def init_config_states():
+def init_config_states(upgrade=False):
     from charmhelpers.core import hookenv
     from charms.reactive import set_state
     config = hookenv.config()
     for opt in config.keys():
-        if config.changed(opt):
+        if config.changed(opt) or upgrade:
             set_state('config.changed')
             set_state('config.changed.{}'.format(opt))
     hookenv.atexit(clear_config_states)
