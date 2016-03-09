@@ -5,7 +5,7 @@ all: lint test
 
 
 lint:
-	@flake8 $(wildcard hooks unit_tests tests)
+	@flake8 $(wildcard hooks reactive unit_tests tests)
 	@charm proof
 
 unit_test:
