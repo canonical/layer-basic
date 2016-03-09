@@ -5,7 +5,10 @@ all: lint test build
 
 
 build: unit_test
-	juju-compose -o ~/charms .
+ifndef JUJU_REPOSITORY
+	$(error JUJU_REPOSITORY must be defined)
+endif
+	charm-build .
 
 lint:
 	@flake8 $(wildcard hooks unit_tests tests)
