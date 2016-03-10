@@ -23,7 +23,7 @@ def bootstrap_charm_deps():
         return
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
-        apt_install(['python3-pip', 'python3-yaml'])
+        apt_install(['python3-pip', 'python3-setuptools', 'python3-yaml'])
         from charms import layer
         cfg = layer.options('basic')
         # include packages defined in layer.yaml
