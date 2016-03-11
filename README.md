@@ -162,6 +162,11 @@ This layer will set the following states:
     **`<option>`** will be replaced by the config option name from `config.yaml`.
     This state is cleared automatically at the end of each hook invocation.
 
+  * **`config.set.<option>`** A specific config option has a True or non-empty
+    value set.  **`<option>`** will be replaced by the config option name from
+    `config.yaml`.  This state is cleared automatically at the end of each hook
+    invocation.
+
 An example using the config states would be:
 
 ```python
