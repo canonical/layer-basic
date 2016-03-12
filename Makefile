@@ -1,7 +1,7 @@
 #!/usr/bin/make
 PYTHON := /usr/bin/env python
 
-all: lint test
+all: lint unit_test
 
 
 lint:
