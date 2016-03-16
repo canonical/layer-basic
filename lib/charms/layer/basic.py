@@ -32,7 +32,7 @@ def bootstrap_charm_deps():
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
                 apt_install(['python-virtualenv'])
-                cmd = ['virtualenv', '--python=python3', venv]
+                cmd = ['virtualenv', '-p=python3', '--never-download', venv]
                 if cfg.get('include_system_packages'):
                     cmd.append('--system-site-packages')
                 check_call(cmd)
