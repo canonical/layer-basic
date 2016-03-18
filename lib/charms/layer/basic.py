@@ -31,7 +31,7 @@ def bootstrap_charm_deps():
         return
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
-        apt_install(['python3-pip', 'python3-yaml'])
+        apt_install(['python3-pip', 'python3-setuptools', 'python3-yaml'])
         from charms import layer
         cfg = layer.options('basic')
         # include packages defined in layer.yaml
@@ -40,7 +40,7 @@ def bootstrap_charm_deps():
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
                 apt_install(['python-virtualenv'])
-                cmd = ['virtualenv', '--python=python3', venv]
+                cmd = ['virtualenv', '-ppython3', '--never-download', venv]
                 if cfg.get('include_system_packages'):
                     cmd.append('--system-site-packages')
                 check_call(cmd)
@@ -48,15 +48,20 @@ def bootstrap_charm_deps():
             pip = vpip
         else:
             pip = 'pip3'
-            # save a copy of system pip to prevent `pip3 install -U pip` from changing it
+            # save a copy of system pip to prevent `pip3 install -U pip`
+            # from changing it
             if os.path.exists('/usr/bin/pip'):
                 shutil.copy2('/usr/bin/pip', '/usr/bin/pip.save')
-        # need newer pip, to fix spurious Double Requirement error https://github.com/pypa/pip/issues/56
-        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse', 'pip'])
+        # need newer pip, to fix spurious Double Requirement error:
+        # https://github.com/pypa/pip/issues/56
+        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
+                    'pip'])
         # install the rest of the wheelhouse deps
-        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse'] + glob('wheelhouse/*'))
+        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse'] +
+                   glob('wheelhouse/*'))
         if not cfg.get('use_venv'):
-            # restore system pip to prevent `pip3 install -U pip` from changing it
+            # restore system pip to prevent `pip3 install -U pip`
+            # from changing it
             if os.path.exists('/usr/bin/pip.save'):
                 shutil.copy2('/usr/bin/pip.save', '/usr/bin/pip')
                 os.remove('/usr/bin/pip.save')
@@ -104,11 +109,13 @@ def apt_install(packages):
 def init_config_states():
     from charmhelpers.core import hookenv
     from charms.reactive import set_state
+    from charms.reactive import toggle_state
     config = hookenv.config()
     for opt in config.keys():
         if config.changed(opt):
             set_state('config.changed')
             set_state('config.changed.{}'.format(opt))
+        toggle_state('config.set.{}'.format(opt), config[opt])
     hookenv.atexit(clear_config_states)
 
 
@@ -119,4 +126,5 @@ def clear_config_states():
     remove_state('config.changed')
     for opt in config.keys():
         remove_state('config.changed.{}'.format(opt))
+        remove_state('config.set.{}'.format(opt))
     unitdata.kv().flush()
