@@ -4,7 +4,7 @@ import shutil
 from glob import glob
 from subprocess import check_call
 
-from charms.layers.execd import execd_preinstall
+from charms.layer.execd import execd_preinstall
 
 
 def bootstrap_charm_deps():
