@@ -15,7 +15,7 @@ else:
 
 from charms.layer import basic
 basic.bootstrap_charm_deps()
-basic.init_config_states()
+basic.init_config_states(upgrade=True)
 
 
 # This will load and run the appropriate @hook and other decorated
