@@ -31,6 +31,15 @@ def bootstrap_charm_deps():
         return
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
+        with open('/root/.pydistutils.cfg', 'w') as fp:
+            # make sure that easy_install also only uses the wheelhouse
+            # (see https://github.com/pypa/pip/issues/410)
+            charm_dir = os.environ['CHARM_DIR']
+            fp.writelines([
+                "[easy_install]\n",
+                "allow_hosts = ''\n",
+                "find_links = file://{}/wheelhouse/\n".format(charm_dir),
+            ])
         apt_install(['python3-pip', 'python3-setuptools', 'python3-yaml'])
         from charms import layer
         cfg = layer.options('basic')
@@ -65,6 +74,7 @@ def bootstrap_charm_deps():
             if os.path.exists('/usr/bin/pip.save'):
                 shutil.copy2('/usr/bin/pip.save', '/usr/bin/pip')
                 os.remove('/usr/bin/pip.save')
+        os.remove('/root/.pydistutils.cfg')
         # flag us as having already bootstrapped so we don't do it again
         open('wheelhouse/.bootstrapped', 'w').close()
         # Ensure that the newly bootstrapped libs are available.
