@@ -10,7 +10,7 @@ apt_prereqs:
 
 lint: apt_prereqs
 	@tox --notest
-	@.tox/py34/bin/flake8 $(wildcard hooks reactive lib unit_tests tests)
+	@PATH=`pwd`/.tox/py34/bin:`pwd`/.tox/py35/bin flake8 $(wildcard hooks reactive lib unit_tests tests)
 	@charm proof
 
 unit_test: apt_prereqs
