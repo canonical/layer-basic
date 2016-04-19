@@ -99,6 +99,26 @@ def do_thing():
       hookenv.log("Bar is enabled")
 ```
 
+You can also access layer options in other handlers, such as Bash, using
+the command-line interface:
+
+```bash
+. charms.reactive.sh
+
+@when 'state'
+function do_thing() {
+    if layer_option foo enable-bar; then
+        juju-log "Bar is enabled"
+        juju-log "bar-value is: $(layer_option foo bar-value)"
+    fi
+}
+
+reactive_handler_main
+```
+
+Note that options of type `boolean` will set the exit code, while other types
+will be printed out.
+
 # Hooks
 
 This layer provides hooks that other layers can react to using the decorators
