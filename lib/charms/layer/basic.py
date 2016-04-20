@@ -17,6 +17,8 @@ def bootstrap_charm_deps():
     # and the charm itself can actually succeed. This call does nothing
     # unless the operator has created and populated $CHARM_DIR/exec.d.
     execd_preinstall()
+    # ensure that $CHARM_DIR/bin is on the path, for helper scripts
+    os.environ['PATH'] += ':%s' % os.path.join(os.environ['CHARM_DIR'], 'bin')
     venv = os.path.abspath('../.venv')
     vbin = os.path.join(venv, 'bin')
     vpip = os.path.join(vbin, 'pip')
