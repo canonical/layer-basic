@@ -132,7 +132,10 @@ def init_config_states():
             config_defaults = {key: value.get('default')
                                for key, value in config_defs.items()}
     for opt in config.keys():
-        if config.changed(opt):
+        if config._prev_dict is None:
+            set_state('config.new')
+            set_state('config.new.{}'.format(opt))
+        elif config.changed(opt):
             set_state('config.changed')
             set_state('config.changed.{}'.format(opt))
         toggle_state('config.set.{}'.format(opt), config[opt])
@@ -145,8 +148,10 @@ def clear_config_states():
     from charmhelpers.core import hookenv, unitdata
     from charms.reactive import remove_state
     config = hookenv.config()
+    remove_state('config.new')
     remove_state('config.changed')
     for opt in config.keys():
+        remove_state('config.new.{}'.format(opt))
         remove_state('config.changed.{}'.format(opt))
         remove_state('config.set.{}'.format(opt))
         remove_state('config.default.{}'.format(opt))
