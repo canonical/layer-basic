@@ -136,9 +136,9 @@ def init_config_states():
         if config.changed(opt):
             set_state('config.changed')
             set_state('config.changed.{}'.format(opt))
-        toggle_state('config.set.{}'.format(opt), config[opt])
+        toggle_state('config.set.{}'.format(opt), config.get(opt))
         toggle_state('config.default.{}'.format(opt),
-                     config[opt] == config_defaults[opt])
+                     config.get(opt) == config_defaults[opt])
     hookenv.atexit(clear_config_states)
 
 
