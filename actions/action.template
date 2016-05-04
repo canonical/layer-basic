@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+
+# Load modules from $CHARM_DIR/lib
+import sys
+sys.path.append('lib')  # noqa
+
+import traceback
+
+from charms.layer.basic import init_action_states
+from charms.reactive import main
+from charmhelpers.core import hookenv
+
+if __name__ == '__main__':
+    try:
+        action_name = hookenv.action_name()
+        hookenv.log('Running action {} ({})'.format(action_name,
+                                                    hookenv.action_uuid()))
+
+        # Set the action.{name} state, allowing you to specify standard
+        # handlers run only in the action, or never during the action.
+        init_action_states()
+
+        # This will load and run the appropriate @action and other decorated
+        # handlers from $CHARM_DIR/reactive, $CHARM_DIR/hooks/reactive,
+        # and $CHARM_DIR/hooks/relations.
+        #
+        # See https://jujucharms.com/docs/stable/authors-charm-building
+        # for more information on this pattern.
+        main()
+    except Exception:
+        hookenv.action_fail('Unhandled exception')
+        hookenv.action_set(dict(traceback=traceback.format_exc()))
+        raise

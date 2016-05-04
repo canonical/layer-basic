@@ -152,3 +152,22 @@ def clear_config_states():
         remove_state('config.set.{}'.format(opt))
         remove_state('config.default.{}'.format(opt))
     unitdata.kv().flush()
+
+
+def init_action_states():
+    from charmhelpers.core import hookenv, unitdata
+    from charms.reactive.bus import get_states, set_state, remove_state
+
+    action_state = 'action.{}'.format(hookenv.action_name())
+    set_state(action_state)
+
+    # Remove any previously set action states. They should not exist,
+    # but they might. We flush unitdata twice, and a failure between
+    # them will leave unexpected states set.
+    for state in get_states():
+        if state != action_state and state.startswith('action.'):
+            remove_state(state)
+
+    # These are run in the reverse order they are added.
+    hookenv.atexit(unitdata.kv().flush)
+    hookenv.atexit(remove_state, action_state)
