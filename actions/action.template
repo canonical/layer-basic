@@ -6,7 +6,6 @@ sys.path.append('lib')  # noqa
 
 import traceback
 
-from charms.layer.basic import init_action_states
 from charms.reactive import main
 from charmhelpers.core import hookenv
 
@@ -15,10 +14,6 @@ if __name__ == '__main__':
         action_name = hookenv.action_name()
         hookenv.log('Running action {} ({})'.format(action_name,
                                                     hookenv.action_uuid()))
-
-        # Set the action.{name} state, allowing you to specify standard
-        # handlers run only in the action, or never during the action.
-        init_action_states()
 
         # This will load and run the appropriate @action and other decorated
         # handlers from $CHARM_DIR/reactive, $CHARM_DIR/hooks/reactive,
