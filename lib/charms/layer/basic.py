@@ -134,7 +134,7 @@ def init_config_states():
     config_yaml = os.path.join(hookenv.charm_dir(), 'config.yaml')
     if os.path.exists(config_yaml):
         with open(config_yaml) as fp:
-            config_defs = yaml.load(fp).get('options', {})
+            config_defs = yaml.safe_load(fp).get('options', {})
             config_defaults = {key: value.get('default')
                                for key, value in config_defs.items()}
     for opt in config_defs.keys():
