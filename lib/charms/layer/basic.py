@@ -25,12 +25,7 @@ def bootstrap_charm_deps():
     vpip = os.path.join(vbin, 'pip')
     vpy = os.path.join(vbin, 'python')
     if os.path.exists('wheelhouse/.bootstrapped'):
-        from charms import layer
-        cfg = layer.options('basic')
-        if cfg.get('use_venv') and '.venv' not in sys.executable:
-            # activate the venv
-            os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
-            reload_interpreter(vpy)
+        activate_venv()
         return
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
@@ -89,6 +84,34 @@ def bootstrap_charm_deps():
         # Non-namespace-package libs (e.g., charmhelpers) are available
         # without having to reload the interpreter. :/
         reload_interpreter(vpy if cfg.get('use_venv') else sys.argv[0])
+
+
+def activate_venv():
+    """
+    Activate the venv if enabled in ``layer.yaml``.
+
+    This is handled automatically for normal hooks, but actions might
+    need to invoke this manually, using something like:
+
+        # Load modules from $CHARM_DIR/lib
+        import sys
+        sys.path.append('lib')
+
+        from charms.layer.basic import activate_venv
+        activate_venv()
+
+    This will ensure that modules installed in the charm's
+    virtual environment are available to the action.
+    """
+    venv = os.path.abspath('../.venv')
+    vbin = os.path.join(venv, 'bin')
+    vpy = os.path.join(vbin, 'python')
+    from charms import layer
+    cfg = layer.options('basic')
+    if cfg.get('use_venv') and '.venv' not in sys.executable:
+        # activate the venv
+        os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
+        reload_interpreter(vpy)
 
 
 def reload_interpreter(python):
