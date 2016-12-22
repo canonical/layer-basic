@@ -1,11 +1,20 @@
 import os
 import sys
 import shutil
-import platform
 from glob import glob
 from subprocess import check_call
 
 from charms.layer.execd import execd_preinstall
+
+
+def lsb_release():
+    """Return /etc/lsb-release in a dict"""
+    d = {}
+    with open('/etc/lsb-release', 'r') as lsb:
+        for l in lsb:
+            k, v = l.split('=')
+            d[k.strip()] = v.strip()
+    return d
 
 
 def bootstrap_charm_deps():
@@ -46,7 +55,7 @@ def bootstrap_charm_deps():
         # if we're using a venv, set it up
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
-                distname, version, series = platform.linux_distribution()
+                series = lsb_release()['DISTRIB_CODENAME']
                 if series in ('precise', 'trusty'):
                     apt_install(['python-virtualenv'])
                 else:
