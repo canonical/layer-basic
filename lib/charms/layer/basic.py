@@ -4,8 +4,17 @@ import shutil
 from glob import glob
 from subprocess import check_call
 
-from charmhelpers.core.host import lsb_release
 from charms.layer.execd import execd_preinstall
+
+
+def lsb_release():
+    """Return /etc/lsb-release in a dict"""
+    d = {}
+    with open('/etc/lsb-release', 'r') as lsb:
+        for l in lsb:
+            k, v = l.split('=')
+            d[k.strip()] = v.strip()
+    return d
 
 
 def bootstrap_charm_deps():
