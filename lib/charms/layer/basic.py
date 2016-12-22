@@ -1,10 +1,10 @@
 import os
 import sys
 import shutil
-import platform
 from glob import glob
 from subprocess import check_call
 
+from charmhelpers.core.host import lsb_release
 from charms.layer.execd import execd_preinstall
 
 
@@ -46,7 +46,7 @@ def bootstrap_charm_deps():
         # if we're using a venv, set it up
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
-                distname, version, series = platform.linux_distribution()
+                series = lsb_release()['DISTRIB_CODENAME']
                 if series in ('precise', 'trusty'):
                     apt_install(['python-virtualenv'])
                 else:
