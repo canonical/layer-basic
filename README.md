@@ -1,4 +1,5 @@
 # Overview
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This is the base layer for all charms [built using layers][building].  It
 provides all of the standard Juju hooks and runs the
