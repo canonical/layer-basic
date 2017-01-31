@@ -47,7 +47,12 @@ def bootstrap_charm_deps():
                 "allow_hosts = ''\n",
                 "find_links = file://{}/wheelhouse/\n".format(charm_dir),
             ])
-        apt_install(['python3-pip', 'python3-setuptools', 'python3-yaml'])
+        apt_install([
+           'python3-pip',
+           'python3-setuptools',
+           'python3-yaml',
+           'python3-dev',
+        ])
         from charms import layer
         cfg = layer.options('basic')
         # include packages defined in layer.yaml
