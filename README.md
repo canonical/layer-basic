@@ -207,6 +207,22 @@ def my_opt_changed():
 
 This layer currently does not define any actions.
 
+# Exec.d Support
+
+This is a mechanism used to customize provisioned machines so the charms can
+actually work. This is useful if there are pre-conditions in your cloud that
+you must account for, such as charm pre-requisits (pre-reactive install) or
+environment customization.
+
+The feature implementation documented this as the following:
+
+> Your apt-get install isn't going to work until your bonded
+network has been configured and connected to the right vlan, the beta firmware 
+loaded and injected with ipsec keys so it can pull packages from the proxy
+discovered by avahi. At which point the charms.reactive framework can be
+imported and kicked off.
+
+
 
 [building]: https://jujucharms.com/docs/devel/authors-charm-building
 [charm-helpers]: https://pythonhosted.org/charmhelpers/
