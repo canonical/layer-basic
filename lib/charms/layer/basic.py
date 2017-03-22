@@ -135,7 +135,7 @@ def reload_interpreter(python):
     Newly installed modules in namespace packages sometimes seemt to
     not be picked up by Python 3.
     """
-    os.execle(python, python, sys.argv[0], os.environ)
+    os.execve(python, [python] + list(sys.argv), os.environ)
 
 
 def apt_install(packages):
