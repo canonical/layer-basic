@@ -2,7 +2,8 @@ import os
 import sys
 import shutil
 from glob import glob
-from subprocess import check_call
+from subprocess import check_call, CalledProcessError
+from time import sleep
 
 from charms.layer.execd import execd_preinstall
 
@@ -157,7 +158,15 @@ def apt_install(packages):
            '--option=Dpkg::Options::=--force-confold',
            '--assume-yes',
            'install']
-    check_call(cmd + packages, env=env)
+    for attempt in range(3):
+        try:
+            check_call(cmd + packages, env=env)
+        except CalledProcessError:
+            if attempt == 2:  # third attempt
+                raise
+            sleep(5)
+        else:
+            break
 
 
 def init_config_states():
