@@ -41,7 +41,7 @@ charm-pre-install and any other required resources. The charm-pre-install
 executables are run, and if successful, state saved so they will not be
 run again.
 
-    $CHARM_DIR/exec.d/mynamespace/charm-pre-install
+    $JUJU_CHARM_DIR/exec.d/mynamespace/charm-pre-install
 
 An alternative to branching a charm is to compose a new charm that contains
 the exec.d directory, using the original charm as a layer,
@@ -53,7 +53,7 @@ charmhelpers.core.hookenv.atstart().
 
 
 def default_execd_dir():
-    return os.path.join(os.environ['CHARM_DIR'], 'exec.d')
+    return os.path.join(os.environ['JUJU_CHARM_DIR'], 'exec.d')
 
 
 def execd_module_paths(execd_dir=None):
