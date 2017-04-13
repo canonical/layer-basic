@@ -152,7 +152,7 @@ This layer supports the following options, which can be set in `layer.yaml`:
 
   * **use_venv**  If set to true, the charm dependencies from the various
     layers' `wheelhouse.txt` files will be installed in a Python virtualenv
-    located at `$CHARM_DIR/../.venv`.  This keeps charm dependencies from
+    located at `$JUJU_CHARM_DIR/../.venv`.  This keeps charm dependencies from
     conflicting with payload dependencies, but you must take care to preserve
     the environment and interpreter if using `execl` or `subprocess`.
 

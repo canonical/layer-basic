@@ -26,10 +26,11 @@ def bootstrap_charm_deps():
     # access the network, because sites use this hook to do bespoke
     # configuration and install secrets so the rest of this bootstrap
     # and the charm itself can actually succeed. This call does nothing
-    # unless the operator has created and populated $CHARM_DIR/exec.d.
+    # unless the operator has created and populated $JUJU_CHARM_DIR/exec.d.
     execd_preinstall()
-    # ensure that $CHARM_DIR/bin is on the path, for helper scripts
-    os.environ['PATH'] += ':%s' % os.path.join(os.environ['CHARM_DIR'], 'bin')
+    # ensure that $JUJU_CHARM_DIR/bin is on the path, for helper scripts
+    charm_dir = os.environ['JUJU_CHARM_DIR']
+    os.environ['PATH'] += ':%s' % os.path.join(charm_dir, 'bin')
     venv = os.path.abspath('../.venv')
     vbin = os.path.join(venv, 'bin')
     vpip = os.path.join(vbin, 'pip')
@@ -42,7 +43,6 @@ def bootstrap_charm_deps():
         with open('/root/.pydistutils.cfg', 'w') as fp:
             # make sure that easy_install also only uses the wheelhouse
             # (see https://github.com/pypa/pip/issues/410)
-            charm_dir = os.environ['CHARM_DIR']
             fp.writelines([
                 "[easy_install]\n",
                 "allow_hosts = ''\n",
@@ -108,7 +108,7 @@ def activate_venv():
     This is handled automatically for normal hooks, but actions might
     need to invoke this manually, using something like:
 
-        # Load modules from $CHARM_DIR/lib
+        # Load modules from $JUJU_CHARM_DIR/lib
         import sys
         sys.path.append('lib')
 

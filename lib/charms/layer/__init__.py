@@ -15,7 +15,7 @@ class LayerOptions(dict):
 
 def options(section=None, layer_file=None):
     if not layer_file:
-        base_dir = os.environ.get('CHARM_DIR', os.getcwd())
+        base_dir = os.environ.get('JUJU_CHARM_DIR', os.getcwd())
         layer_file = os.path.join(base_dir, 'layer.yaml')
 
     return LayerOptions(layer_file, section)
