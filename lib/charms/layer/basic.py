@@ -169,11 +169,43 @@ def apt_install(packages):
             break
 
 
+def _patch_config_cached():
+    """
+    For performance reasons, the update-status hook was intended to be as
+    lightweight as possible and ideally to not make any API calls to the
+    controller at all.  On large deployments, reactive charms have been
+    found to cause some performance issues on the controller due to not
+    treating update-status differently from any other hook and always
+    making at least one API call to read the charm config during startup.
+    So, until we can socialize update-status being treated differently
+    in reactive, this is a hacky work-around to attempt to reduce that
+    performance issue.  Since we don't expect config to change in an
+    update-status hook, we instead patch hookenv.config() to return
+    a cached copy of the config instead.  This may not prevent all
+    calls to the controller API, depending on what else the reactive
+    charms do, but it should make a noticable difference.
+    """
+    import json
+    from charmhelpers.core import hookenv
+    cached_path = os.path.join(hookenv.charm_dir(),
+                               hookenv.Config.CONFIG_FILE_NAME)
+    if os.path.exists(cached_path):
+        with open(cached_path) as f:
+            cached_config = json.load(f)
+    else:
+        cached_config = {}
+    config = hookenv.Config(cached_config)
+    hookenv.config = lambda scope=None: (config if scope is None
+                                         else config.get(scope))
+
+
 def init_config_states():
     import yaml
     from charmhelpers.core import hookenv
     from charms.reactive import set_state
     from charms.reactive import toggle_state
+    if hookenv.hook_name() == 'update-status':
+        _patch_config_cached()
     config = hookenv.config()
     config_defaults = {}
     config_defs = {}
