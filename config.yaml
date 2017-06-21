@@ -1,0 +1,5 @@
+options:
+  dry-run:
+    type: boolean
+    description: "Enable dry-run mode for charm"
+    default: false
