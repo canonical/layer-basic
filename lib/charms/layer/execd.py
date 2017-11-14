@@ -23,32 +23,8 @@ import time
 '''
 execd/preinstall
 
-It is often necessary to configure and reconfigure machines
-after provisioning, but before attempting to run the charm.
-Common examples are specialized network configuration, enabling
-of custom hardware, non-standard disk partitioning and filesystems,
-adding secrets and keys required for using a secured network.
-
-The reactive framework's base layer invokes this mechanism as
-early as possible, before any network access is made or dependencies
-unpacked or non-standard modules imported (including the charms.reactive
-framework itself).
-
-Operators needing to use this functionality may branch a charm and
-create an exec.d directory in it. The exec.d directory in turn contains
-one or more subdirectories, each of which contains an executable called
-charm-pre-install and any other required resources. The charm-pre-install
-executables are run, and if successful, state saved so they will not be
-run again.
-
-    $JUJU_CHARM_DIR/exec.d/mynamespace/charm-pre-install
-
-An alternative to branching a charm is to compose a new charm that contains
-the exec.d directory, using the original charm as a layer,
-
-A charm author could also abuse this mechanism to modify the charm
-environment in unusual ways, but for most purposes it is saner to use
-charmhelpers.core.hookenv.atstart().
+Read the layer-basic docs for more info on how to use this feature.
+https://charmsreactive.readthedocs.io/en/latest/layer-basic.html#exec-d-support
 '''
 
 
