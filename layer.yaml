@@ -5,13 +5,13 @@ defines:
     description: Additional packages to be installed at time of bootstrap
   use_venv:
     type: boolean
-    default: false
+    default: true
     description: >
       Install charm dependencies (wheelhouse) into a Python virtual environment
       to help avoid conflicts with other charms or libraries on the machine.
   include_system_packages:
     type: boolean
-    default: false
+    default: true
     description: >
       If using a virtual environment, allow the venv to see Python packages
       installed at the system level.  This reduces isolation, but is necessary

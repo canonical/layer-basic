@@ -92,6 +92,22 @@ def bootstrap_charm_deps():
                 shutil.copy2('/usr/bin/pip.save', '/usr/bin/pip')
                 os.remove('/usr/bin/pip.save')
         os.remove('/root/.pydistutils.cfg')
+        # setup wrappers to ensure envs are used for scripts
+        shutil.copy2('bin/layer-basic-wrapper', '/usr/local/sbin/')
+        for wrapper in ('charms.reactive', 'charms.reactive.sh',
+                        'chlp', 'layer_option'):
+            src = os.path.join('/usr/local/sbin', 'layer-basic-wrapper')
+            dst = os.path.join('/usr/local/sbin', wrapper)
+            if not os.path.exists(dst):
+                os.symlink(src, dst)
+        if cfg.get('use_venv'):
+            shutil.copy2('bin/layer_option', vbin)
+        else:
+            shutil.copy2('bin/layer_option', '/usr/local/bin/')
+        # re-link the charm copy to the wrapper in case charms
+        # call bin/layer_option directly (as was the old pattern)
+        os.remove('bin/layer_option')
+        os.symlink('/usr/local/sbin/layer_option', 'bin/layer_option')
         # flag us as having already bootstrapped so we don't do it again
         open('wheelhouse/.bootstrapped', 'w').close()
         # Ensure that the newly bootstrapped libs are available.
