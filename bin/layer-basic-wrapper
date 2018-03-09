@@ -52,7 +52,10 @@ find_charm_dirs
 try_activate_venv
 export PYTHONPATH="$JUJU_CHARM_DIR/lib:$PYTHONPATH"
 
-if [[ "$0" == "$BASH_SOURCE" ]]; then
+if [[ "$(basename "$0")" == "layer-basic-wrapper" ]]; then
+    # being used as a shebang
+    exec "$@"
+elif [[ "$0" == "$BASH_SOURCE" ]]; then
     # being invoked
     exec "$(find_wrapped)" "$@"
 else
