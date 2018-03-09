@@ -56,9 +56,12 @@ if [[ "$(basename "$0")" == "charm-env" ]]; then
     # being used as a shebang
     exec "$@"
 elif [[ "$0" == "$BASH_SOURCE" ]]; then
-    # being invoked
+    # being invoked as a symlink wrapping something to find in the venv
     exec "$(find_wrapped)" "$@"
+elif [[ "$(basename "$BASH_SOURCE")" == "charm-env" ]]; then
+    # being sourced directly; do nothing
+    /bin/true
 else
-    # being sourced
+    # being sourced for wrapped bash helpers
     . "$(find_wrapped)"
 fi
