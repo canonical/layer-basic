@@ -1,15 +1,21 @@
 #!/bin/bash
 
 find_charm_dirs() {
-    # try to guess the value for CHARM_DIR by looking for a non-subordinate
-    # charm directory; if there are several, pick the first by alpha order
-    if [[ -n "$JUJU_CHARM_DIR" ]]; then
+    # Hopefully, $JUJU_CHARM_DIR is set so which venv to use in unambiguous.
+    if [[ -n "$JUJU_CHARM_DIR" || -n "$CHARM_DIR" ]]; then
+        if [[ -z "$JUJU_CHARM_DIR" ]]; then
+            # accept $CHARM_DIR to be more forgiving
+            export JUJU_CHARM_DIR="$CHARM_DIR"
+        fi
         if [[ -z "$CHARM_DIR" ]]; then
             # set CHARM_DIR as well to help with backwards compatibility
             export CHARM_DIR="$JUJU_CHARM_DIR"
         fi
         return
     fi
+    # Try to guess the value for JUJU_CHARM_DIR by looking for a non-subordinate
+    # (because there's got to be at least one principle) charm directory;
+    # if there are several, pick the first by alpha order.
     agents_dir="/var/lib/juju/agents"
     if [[ -d "$agents_dir" ]]; then
         non_subordinates="$(grep -L 'subordinate:.*true' "$agents_dir"/*/charm/metadata.yaml | wc -l)"
