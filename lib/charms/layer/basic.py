@@ -93,10 +93,10 @@ def bootstrap_charm_deps():
                 os.remove('/usr/bin/pip.save')
         os.remove('/root/.pydistutils.cfg')
         # setup wrappers to ensure envs are used for scripts
-        shutil.copy2('bin/layer-basic-wrapper', '/usr/local/sbin/')
+        shutil.copy2('bin/charm-env', '/usr/local/sbin/')
         for wrapper in ('charms.reactive', 'charms.reactive.sh',
                         'chlp', 'layer_option'):
-            src = os.path.join('/usr/local/sbin', 'layer-basic-wrapper')
+            src = os.path.join('/usr/local/sbin', 'charm-env')
             dst = os.path.join('/usr/local/sbin', wrapper)
             if not os.path.exists(dst):
                 os.symlink(src, dst)
