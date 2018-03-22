@@ -85,7 +85,8 @@ def bootstrap_charm_deps():
         # per https://github.com/juju-solutions/layer-basic/issues/110
         # this replaces the setuptools that was copied over from the system on
         # venv create with latest setuptools and adds setuptools_scm
-        check_call([pip, 'install', '-U', 'setuptools', 'setuptools_scm'])
+        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
+                    'setuptools', 'setuptools-scm'])
         # install the rest of the wheelhouse deps
         check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse'] +
                    glob('wheelhouse/*'))
