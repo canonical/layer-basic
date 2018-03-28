@@ -37,6 +37,8 @@ def import_layer_libs():
     """
     for module_file in Path('lib/charms/layer').glob('*'):
         module_name = module_file.stem
-        if module_name in ('__init__', 'basic', 'execd'):
+        if module_name in ('__init__', 'basic', 'execd') or not (
+            module_file.suffix == '.py' or module_file.is_dir()
+        ):
             continue
         import_module('charms.layer.{}'.format(module_name))
