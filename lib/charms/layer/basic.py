@@ -5,6 +5,7 @@ from glob import glob
 from subprocess import check_call, CalledProcessError
 from time import sleep
 
+from charms import layer
 from charms.layer.execd import execd_preinstall
 
 
@@ -142,12 +143,12 @@ def activate_venv():
     venv = os.path.abspath('../.venv')
     vbin = os.path.join(venv, 'bin')
     vpy = os.path.join(vbin, 'python')
-    from charms import layer
     cfg = layer.options('basic')
     if cfg.get('use_venv') and '.venv' not in sys.executable:
         # activate the venv
         os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
         reload_interpreter(vpy)
+    layer.import_layer_libs()
 
 
 def reload_interpreter(python):
