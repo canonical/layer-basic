@@ -36,9 +36,27 @@ def bootstrap_charm_deps():
     vbin = os.path.join(venv, 'bin')
     vpip = os.path.join(vbin, 'pip')
     vpy = os.path.join(vbin, 'python')
-    if os.path.exists('wheelhouse/.bootstrapped'):
+    hook_name = os.path.basename(sys.argv[0])
+    is_bootstrapped = os.path.exists('wheelhouse/.bootstrapped')
+    is_charm_upgrade = hook_name == 'upgrade-charm'
+    is_series_upgrade = hook_name == 'post-series-upgrade'
+    post_upgrade = os.path.exists('wheelhouse/.upgrade')
+    is_upgrade = not post_upgrade and (is_charm_upgrade or is_series_upgrade)
+    if is_bootstrapped and not is_upgrade:
         activate_venv()
+        # the .upgrade file prevents us from getting stuck in a loop
+        # when re-execing to activate the venv; at this point, we've
+        # activated the venv, so it's safe to clear it
+        if post_upgrade:
+            os.unlink('wheelhouse/.upgrade')
         return
+    if is_series_upgrade and os.path.exists(venv):
+        # series upgrade should do a full clear of the venv, rather than just
+        # updating it, to bring in updates to Python itself
+        shutil.rmtree(venv)
+    if is_upgrade:
+        os.unlink('wheelhouse/.bootstrapped')
+        open('wheelhouse/.upgrade', 'w').close()
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
         with open('/root/.pydistutils.cfg', 'w') as fp:
