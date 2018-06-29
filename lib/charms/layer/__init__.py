@@ -40,3 +40,11 @@ class OptionsBackwardsCompatibilityHack(sys.modules[__name__].__class__):
 def patch_options_interface():
     from charms.layer import options
     options.__class__ = OptionsBackwardsCompatibilityHack
+
+
+try:
+    patch_options_interface()
+except ImportError:
+    # This may fail if pyyaml hasn't been installed yet. But in that
+    # case, the bootstrap logic will try it again once it has.
+    pass
