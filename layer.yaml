@@ -1,3 +1,4 @@
+includes: ['layer:options']
 defines:
   packages:
     type: array
