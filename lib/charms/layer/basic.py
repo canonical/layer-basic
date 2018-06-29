@@ -149,6 +149,7 @@ def activate_venv():
         # activate the venv
         os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
         reload_interpreter(vpy)
+    layer.patch_options_interface()
     layer.import_layer_libs()
 
 

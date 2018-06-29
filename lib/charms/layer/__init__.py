@@ -1,3 +1,4 @@
+import sys
 from importlib import import_module
 from pathlib import Path
 
@@ -21,3 +22,21 @@ def import_layer_libs():
         ):
             continue
         import_module('charms.layer.{}'.format(module_name))
+
+
+# Terrible hack to support the old terrible interface.
+# Try to get people to call layer.options.get() instead so
+# that we can remove this garbage.
+# Cribbed from https://stackoverfLow.com/a/48100440/4941864
+class OptionsBackwardsCompatibilityHack(sys.modules[__name__].__class__):
+    def __call__(self, section=None, layer_file=None):
+        if layer_file is None:
+            return self.get(section=section)
+        else:
+            return self.get(section=section,
+                            layer_file=Path(layer_file))
+
+
+def patch_options_interface():
+    from charms.layer import options
+    options.__class__ = OptionsBackwardsCompatibilityHack
