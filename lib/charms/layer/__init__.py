@@ -1,26 +1,6 @@
-import os
+import sys
 from importlib import import_module
 from pathlib import Path
-
-
-class LayerOptions(dict):
-    def __init__(self, layer_file, section=None):
-        import yaml  # defer, might not be available until bootstrap
-        with open(layer_file) as f:
-            layer = yaml.safe_load(f.read())
-        opts = layer.get('options', {})
-        if section and section in opts:
-            super(LayerOptions, self).__init__(opts.get(section))
-        else:
-            super(LayerOptions, self).__init__(opts)
-
-
-def options(section=None, layer_file=None):
-    if not layer_file:
-        base_dir = os.environ.get('JUJU_CHARM_DIR', os.getcwd())
-        layer_file = os.path.join(base_dir, 'layer.yaml')
-
-    return LayerOptions(layer_file, section)
 
 
 def import_layer_libs():
@@ -42,3 +22,29 @@ def import_layer_libs():
         ):
             continue
         import_module('charms.layer.{}'.format(module_name))
+
+
+# Terrible hack to support the old terrible interface.
+# Try to get people to call layer.options.get() instead so
+# that we can remove this garbage.
+# Cribbed from https://stackoverfLow.com/a/48100440/4941864
+class OptionsBackwardsCompatibilityHack(sys.modules[__name__].__class__):
+    def __call__(self, section=None, layer_file=None):
+        if layer_file is None:
+            return self.get(section=section)
+        else:
+            return self.get(section=section,
+                            layer_file=Path(layer_file))
+
+
+def patch_options_interface():
+    from charms.layer import options
+    options.__class__ = OptionsBackwardsCompatibilityHack
+
+
+try:
+    patch_options_interface()
+except ImportError:
+    # This may fail if pyyaml hasn't been installed yet. But in that
+    # case, the bootstrap logic will try it again once it has.
+    pass

@@ -55,8 +55,8 @@ def bootstrap_charm_deps():
             'python3-yaml',
             'python3-dev',
         ])
-        from charms import layer
-        cfg = layer.options('basic')
+        from charms.layer import options
+        cfg = options.get('basic')
         # include packages defined in layer.yaml
         apt_install(cfg.get('packages', []))
         # if we're using a venv, set it up
@@ -140,14 +140,16 @@ def activate_venv():
     This will ensure that modules installed in the charm's
     virtual environment are available to the action.
     """
+    from charms.layer import options
     venv = os.path.abspath('../.venv')
     vbin = os.path.join(venv, 'bin')
     vpy = os.path.join(vbin, 'python')
-    cfg = layer.options('basic')
-    if cfg.get('use_venv') and '.venv' not in sys.executable:
+    use_venv = options.get('basic', 'use_venv')
+    if use_venv and '.venv' not in sys.executable:
         # activate the venv
         os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
         reload_interpreter(vpy)
+    layer.patch_options_interface()
     layer.import_layer_libs()
 
 
