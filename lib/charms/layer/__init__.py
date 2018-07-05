@@ -39,7 +39,17 @@ class OptionsBackwardsCompatibilityHack(sys.modules[__name__].__class__):
 
 def patch_options_interface():
     from charms.layer import options
-    options.__class__ = OptionsBackwardsCompatibilityHack
+    if sys.version_info.minor >= 5:
+        options.__class__ = OptionsBackwardsCompatibilityHack
+    else:
+        # Py 3.4 doesn't support changing the __class__, so we have to do it
+        # another way.  The last line is needed because we already have a
+        # reference that doesn't get updated with sys.modules.
+        name = options.__name__
+        hack = OptionsBackwardsCompatibilityHack(name)
+        hack.get = options.get
+        sys.modules[name] = hack
+        sys.modules[__name__].options = hack
 
 
 try:
