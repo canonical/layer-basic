@@ -54,6 +54,8 @@ def bootstrap_charm_deps():
             'python3-setuptools',
             'python3-yaml',
             'python3-dev',
+            'python3-wheel',
+            'build-essential',
         ])
         from charms.layer import options
         cfg = options.get('basic')
