@@ -3,7 +3,16 @@ defines:
   packages:
     type: array
     default: []
-    description: Additional packages to be installed at time of bootstrap
+    description: Additional packages to be installed at time of bootstrap.
+  python_packages:
+    type: array
+    default: []
+    description: >
+      Additional Python packages to be installed at time of bootstrap.
+      These should be in standard Python requirement form.  This is useful
+      if you have Python libraries that your charm code depends on but which
+      require compilation on the target architecture, and thus can't be
+      pre-packaged in the wheelhouse.
   use_venv:
     type: boolean
     default: true

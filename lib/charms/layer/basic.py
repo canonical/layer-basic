@@ -93,6 +93,8 @@ def bootstrap_charm_deps():
         # install the rest of the wheelhouse deps
         check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse'] +
                    glob('wheelhouse/*'))
+        if cfg['python_packages']:
+            check_call([pip, 'install', '-U'] + cfg['python_packages'])
         if not cfg.get('use_venv'):
             # restore system pip to prevent `pip3 install -U pip`
             # from changing it
