@@ -190,6 +190,12 @@ def apt_install(packages):
         except CalledProcessError:
             if attempt == 2:  # third attempt
                 raise
+            try:
+                # sometimes apt-get update needs to be run
+                check_call(['apt-get', 'update'])
+            except CalledProcessError:
+                # sometimes it's a dpkg lock issue
+                pass
             sleep(5)
         else:
             break
