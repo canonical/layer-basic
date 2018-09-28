@@ -93,6 +93,9 @@ def bootstrap_charm_deps():
         # install the rest of the wheelhouse deps
         check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse'] +
                    glob('wheelhouse/*'))
+        # re-enable installation from pypi
+        os.remove('/root/.pydistutils.cfg')
+        # install python packages from layer options
         if cfg['python_packages']:
             check_call([pip, 'install', '-U'] + cfg['python_packages'])
         if not cfg.get('use_venv'):
@@ -101,7 +104,6 @@ def bootstrap_charm_deps():
             if os.path.exists('/usr/bin/pip.save'):
                 shutil.copy2('/usr/bin/pip.save', '/usr/bin/pip')
                 os.remove('/usr/bin/pip.save')
-        os.remove('/root/.pydistutils.cfg')
         # setup wrappers to ensure envs are used for scripts
         shutil.copy2('bin/charm-env', '/usr/local/sbin/')
         for wrapper in ('charms.reactive', 'charms.reactive.sh',
