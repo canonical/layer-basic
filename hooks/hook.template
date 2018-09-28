@@ -4,9 +4,12 @@
 import sys
 sys.path.append('lib')
 
-from charms.layer import basic
+from charms.layer import basic  # noqa
 basic.bootstrap_charm_deps()
-basic.init_config_states()
+
+from charmhelpers.core import hookenv  # noqa
+hookenv.atstart(basic.init_config_states)
+hookenv.atexit(basic.clear_config_states)
 
 
 # This will load and run the appropriate @hook and other decorated
@@ -15,5 +18,5 @@ basic.init_config_states()
 #
 # See https://jujucharms.com/docs/stable/authors-charm-building
 # for more information on this pattern.
-from charms.reactive import main
+from charms.reactive import main  # noqa
 main()
