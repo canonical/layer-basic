@@ -244,7 +244,6 @@ def init_config_states():
         toggle_state('config.set.{}'.format(opt), config.get(opt))
         toggle_state('config.default.{}'.format(opt),
                      config.get(opt) == config_defaults[opt])
-    hookenv.atexit(clear_config_states)
 
 
 def clear_config_states():
