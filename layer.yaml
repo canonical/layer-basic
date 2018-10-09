@@ -26,3 +26,8 @@ defines:
       If using a virtual environment, allow the venv to see Python packages
       installed at the system level.  This reduces isolation, but is necessary
       to use Python packages installed via apt-get.
+  trace:
+    type: boolean
+    default: true
+    description: >
+      Enable DEBUG logging of charms.reactive flag changes and active handlers.
