@@ -1,0 +1,4 @@
+#!/bin/bash
+
+chlp unitdata set layer.basic.disable-charm true
+echo 'All charm code execution has been disabled in preparation for unit removal.'

@@ -125,15 +125,17 @@ def bootstrap_charm_deps():
         # setup wrappers to ensure envs are used for scripts
         shutil.copy2('bin/charm-env', '/usr/local/sbin/')
         for wrapper in ('charms.reactive', 'charms.reactive.sh',
-                        'chlp', 'layer_option'):
+                        'chlp', 'layer_option', 'disable-charm'):
             src = os.path.join('/usr/local/sbin', 'charm-env')
             dst = os.path.join('/usr/local/sbin', wrapper)
             if not os.path.exists(dst):
                 os.symlink(src, dst)
         if cfg.get('use_venv'):
             shutil.copy2('bin/layer_option', vbin)
+            shutil.copy2('bin/disable-charm', vbin)
         else:
             shutil.copy2('bin/layer_option', '/usr/local/bin/')
+            shutil.copy2('bin/disable-charm', '/usr/local/bin/')
         # re-link the charm copy to the wrapper in case charms
         # call bin/layer_option directly (as was the old pattern)
         os.remove('bin/layer_option')

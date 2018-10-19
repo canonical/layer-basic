@@ -8,6 +8,15 @@ from charms.layer import basic  # noqa
 basic.bootstrap_charm_deps()
 
 from charmhelpers.core import hookenv  # noqa
+from charmhelpers.core import unitdata  # noqa
+
+# workaround https://bugs.launchpad.net/juju/+bug/1741506 by allowing all charm
+# code execution to be disabled to skip past any errors blocking removal
+if unitdata.kv().get('layer.basic.disable-charm', False):
+    hookenv.log('Charm has been disabled, skipping all charm code!',
+                level=hookenv.WARNING)
+    raise SystemExit(0)
+
 hookenv.atstart(basic.init_config_states)
 hookenv.atexit(basic.clear_config_states)
 
