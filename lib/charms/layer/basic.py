@@ -55,7 +55,8 @@ def bootstrap_charm_deps():
         # updating it, to bring in updates to Python itself
         shutil.rmtree(venv)
     if is_upgrade:
-        os.unlink('wheelhouse/.bootstrapped')
+        if os.path.exists('wheelhouse/.bootstrapped'):
+            os.unlink('wheelhouse/.bootstrapped')
         open('wheelhouse/.upgrade', 'w').close()
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
