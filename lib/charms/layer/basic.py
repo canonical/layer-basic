@@ -115,8 +115,8 @@ def bootstrap_charm_deps():
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
         # install python packages from layer options
-        if cfg['python_packages']:
-            check_call([pip, 'install', '-U'] + cfg['python_packages'])
+        if cfg.get('python_packages'):
+            check_call([pip, 'install', '-U'] + cfg.get('python_packages'))
         if not cfg.get('use_venv'):
             # restore system pip to prevent `pip3 install -U pip`
             # from changing it
