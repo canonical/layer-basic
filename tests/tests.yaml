@@ -1,0 +1,5 @@
+charm_name: minimal
+gate_bundles:
+- minimal
+tests:
+- zaza.charm_tests.noop.tests.NoopTest
