@@ -2,12 +2,23 @@
 sudo: required
 dist: xenial
 language: python
-python:
-  - "3.6"
 install: pip install tox-travis
-env:
- - ENV=flake8,py35,py36
- - ENV=func
+matrix:
+  include:
+    - name: "Python 3.4"
+      python: 3.4
+      env: ENV=flake8,py3
+    - name: "Python 3.5"
+      python: 3.5
+      env: ENV=flake8,py3
+    - name: "Python 3.6"
+      python: 3.6
+      env: ENV=flake8,py3
+    - name: "Python 3.7"
+      python: 3.7
+      env: ENV=flake8,py3
+    - name: "Functional test"
+      env: ENV=func
 comment: |
   install dependencies in script phase saving time on simpler test environments
   sudo back to ourself to activate lxd group membership executable search path
