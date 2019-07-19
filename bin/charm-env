@@ -1,9 +1,7 @@
 #!/bin/bash
 
-if [[ "$1" == "--version" || "$1" == "-v" ]]; then
-    echo 1.1.0
-    exit 0
-fi
+VERSION="1.0.0"
+
 
 find_charm_dirs() {
     # Hopefully, $JUJU_CHARM_DIR is set so which venv to use in unambiguous.
@@ -73,6 +71,12 @@ try_activate_venv() {
 find_wrapped() {
     PATH="${PATH/\/usr\/local\/sbin:}" which "$(basename "$0")"
 }
+
+
+if [[ "$1" == "--version" || "$1" == "-v" ]]; then
+    echo "$VERSION"
+    exit 0
+fi
 
 
 # allow --charm option to hint which JUJU_CHARM_DIR to choose when ambiguous
