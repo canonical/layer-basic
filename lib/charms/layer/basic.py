@@ -157,13 +157,13 @@ def install_or_update_charm_env():
         installed_version = parse_version(
             check_output(['/usr/local/sbin/charm-env',
                           '--version']).decode('utf8'))
-    except CalledProcessError:
+    except (CalledProcessError, FileNotFoundError):
         installed_version = parse_version('0.0.0')
     try:
         bundled_version = parse_version(
             check_output(['bin/charm-env',
                           '--version']).decode('utf8'))
-    except CalledProcessError:
+    except (CalledProcessError, FileNotFoundError):
         bundled_version = parse_version('0.0.0')
     if installed_version < bundled_version:
         shutil.copy2('bin/charm-env', '/usr/local/sbin/')
