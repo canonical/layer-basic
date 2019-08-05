@@ -4,7 +4,6 @@ import shutil
 from glob import glob
 from subprocess import check_call, check_output, CalledProcessError
 from time import sleep
-from pkg_resources import parse_version
 
 from charms import layer
 from charms.layer.execd import execd_preinstall
@@ -153,6 +152,13 @@ def bootstrap_charm_deps():
 
 
 def install_or_update_charm_env():
+    # On Trusty python3-pkg-resources is not installed
+    try:
+        from pkg_resources import parse_version
+    except ImportError:
+        apt_install(['python3-pkg-resources'])
+        from pkg_resources import parse_version
+
     try:
         installed_version = parse_version(
             check_output(['/usr/local/sbin/charm-env',
