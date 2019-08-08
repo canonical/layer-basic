@@ -13,6 +13,8 @@ comment: |
   sudo back to ourself to activate lxd group membership executable search path
 script:
   - if [ $ENV = 'func' ]; then
+      sudo apt update;
+      sudo apt install -y distro-info;
       sudo apt remove -y --purge lxd lxd-client;
       sudo snap install lxd;
       sudo snap install juju --classic;
