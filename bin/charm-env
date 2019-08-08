@@ -43,7 +43,7 @@ find_charm_dirs() {
             return
         fi
         # shellcheck disable=SC2126
-        non_subordinates="$(grep -L 'subordinate:.*true' "$agents_dir"/unit-*/charm/metadata.yaml | wc -l)"
+        non_subordinates="$(grep -L 'subordinate"\?:.*true' "$agents_dir"/unit-*/charm/metadata.yaml | wc -l)"
         if [[ "$non_subordinates" -gt 1 ]]; then
             >&2 echo 'Ambiguous possibilities for JUJU_CHARM_DIR; please use --charm or run within a Juju hook context'
             exit 1
