@@ -25,7 +25,7 @@ find_charm_dirs() {
         found_charm_dir=""
         if [[ -n "$desired_charm" ]]; then
             for charm_dir in $(/bin/ls -d "$agents_dir"/unit-*/charm); do
-                charm_name="$(JUJU_CHARM_DIR="$charm_dir" charm-env python3 -c 'from charmhelpers.core.hookenv import charm_name; print(charm_name())')"
+                charm_name="$(grep -o '^['\''"]\?name['\''"]\?:.*' $charm_dir/metadata.yaml 2> /dev/null | sed -e 's/.*: *//' -e 's/['\''"]//g')"
                 if [[ "$charm_name" == "$desired_charm" ]]; then
                     if [[ -n "$found_charm_dir" ]]; then
                         >&2 echo "Ambiguous possibilities for JUJU_CHARM_DIR matching '$desired_charm'; please run within a Juju hook context"
