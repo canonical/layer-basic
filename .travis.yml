@@ -1,0 +1,47 @@
+---
+sudo: required
+dist: xenial
+language: python
+install: pip install tox-travis
+matrix:
+  include:
+    - name: "Python 3.4"
+      python: 3.4
+      env: ENV=flake8,py3
+    - name: "Python 3.5"
+      python: 3.5
+      env: ENV=flake8,py3
+    - name: "Python 3.6"
+      python: 3.6
+      env: ENV=flake8,py3
+    - name: "Python 3.7"
+      python: 3.7
+      env: ENV=flake8,py3
+    - name: "Functional test"
+      env: ENV=func
+comment: |
+  install dependencies in script phase saving time on simpler test environments
+  sudo back to ourself to activate lxd group membership executable search path
+script:
+  - if [ $ENV = 'func' ]; then
+      sudo apt update;
+      sudo apt install -y distro-info;
+      sudo apt remove -y --purge lxd lxd-client;
+      sudo snap install lxd;
+      sudo snap install juju --classic;
+      sudo snap install charm --classic;
+      sudo sh -c 'echo PATH=/snap/bin:$PATH >> /etc/environment';
+      sudo lxd waitready;
+      sudo lxd init --auto;
+      sudo usermod -a -G lxd travis;
+      sudo su - travis -c 'juju bootstrap --no-gui localhost';
+    fi
+  - echo "export PATH=$PATH;cd $(pwd)" > $HOME/saved_path
+  - sudo su - travis -c "source $HOME/saved_path; tox -c tox.ini -e $ENV";
+  - if [ $ENV = 'func' ]; then
+      sudo su travis -c 'juju status -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/)';
+    fi
+after_failure:
+  - if [ $ENV = 'func' ]; then
+      sudo su travis -c 'for application in trusty xenial bionic cosmic disco; do juju ssh -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/) minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";done';
+    fi

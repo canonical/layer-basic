@@ -1,0 +1,17 @@
+applications:
+  minimal-trusty:
+    series: trusty
+    charm: /tmp/charm-builds/minimal
+    num_units: 1
+  minimal-xenial:
+    series: xenial
+    charm: /tmp/charm-builds/minimal
+    num_units: 1
+  minimal-bionic:
+    series: bionic
+    charm: /tmp/charm-builds/minimal
+    num_units: 1
+  minimal-disco:
+    series: disco
+    charm: /tmp/charm-builds/minimal
+    num_units: 1

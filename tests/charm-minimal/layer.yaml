@@ -1,0 +1,5 @@
+includes: ['layer:basic']
+options:
+  basic:
+    packages: ['libffi-dev', 'libssl-dev']
+repo: https://github.com/juju-solutions/layer-basic.git
