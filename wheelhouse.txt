@@ -1,4 +1,7 @@
-pip>=18.1,<19.2
+# pip is pinned to <19.0 to avoid https://github.com/pypa/pip/issues/6164
+# even with installing setuptools before upgrading pip ends up with pip seeing
+# the older setuptools at the system level if include_system_packages is true
+pip>=18.1,<19.0
 setuptools<42
 setuptools-scm<=1.17.0
 charmhelpers>=0.4.0,<1.0.0
