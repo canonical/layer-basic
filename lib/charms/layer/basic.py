@@ -113,8 +113,8 @@ def bootstrap_charm_deps():
         check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
                     'setuptools', 'setuptools-scm'])
         # install the rest of the wheelhouse deps
-        check_call([pip, 'install', '-U', '--ignore-installed', '--no-index', '-f', 'wheelhouse'] +
-                   glob('wheelhouse/*'))
+        check_call([pip, 'install', '-U', '--ignore-installed', '--no-index',
+                   '-f', 'wheelhouse'] + glob('wheelhouse/*'))
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
         # install python packages from layer options
