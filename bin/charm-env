@@ -49,7 +49,7 @@ find_charm_dirs() {
             exit 1
         elif [[ "$non_subordinates" -eq 1 ]]; then
             for charm_dir in $(/bin/ls -d "$agents_dir"/unit-*/charm); do
-                if grep -q 'subordinate:.*true' "$charm_dir/metadata.yaml"; then
+                if grep -q 'subordinate"\?:.*true' "$charm_dir/metadata.yaml"; then
                     continue
                 fi
                 export JUJU_CHARM_DIR="$charm_dir"
