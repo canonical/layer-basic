@@ -129,7 +129,6 @@ def bootstrap_charm_deps():
             # (see https://github.com/pypa/pip/issues/410)
             fp.writelines([
                 "[easy_install]\n",
-                "allow_hosts = ''\n",
                 "find_links = file://{}/wheelhouse/\n".format(charm_dir),
             ])
         if 'centos' in series:
