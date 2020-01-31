@@ -11,7 +11,7 @@ applications:
     series: bionic
     charm: /tmp/charm-builds/minimal
     num_units: 1
-  minimal-disco:
-    series: disco
+  minimal-eoan:
+    series: eoan
     charm: /tmp/charm-builds/minimal
     num_units: 1
