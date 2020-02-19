@@ -9,6 +9,7 @@ from time import sleep
 from charms import layer
 from charms.layer.execd import execd_preinstall
 
+
 def get_series():
     """
     Return series for a few known OS:es.
@@ -34,8 +35,8 @@ def get_series():
     elif os.path.isfile('/etc/redhat-release'):
         with open('/etc/redhat-release', 'r') as redhatlsb:
             # CentOS Linux release 7.7.1908 (Core)
-            l = redhatlsb.readline()
-            release = int(l.split("release")[1].split()[0][0])
+            line = redhatlsb.readline()
+            release = int(line.split("release")[1].split()[0][0])
             series = "centos" + str(release)
 
     # Looking for content in /etc/lsb-release
@@ -81,7 +82,7 @@ def bootstrap_charm_deps():
     centos_packages = ['python3-pip',
                        'python3-setuptools',
                        'python3-devel',
-                       'python3-wheel' ]
+                       'python3-wheel']
 
     packages_needed = []
     if 'centos' in series:
@@ -178,8 +179,9 @@ def bootstrap_charm_deps():
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
 
-        # install pyyaml for centos7 altough this can be made through cloud-init
-        # Info : https://discourse.jujucharms.com/t/charms-for-centos-lets-begin/2339/8?u=erik-lonroth
+        # install pyyaml for centos7, since, unlike the ubuntu image, the
+        # default image for centos doesn't include pyyaml; see the discussion:
+        # https://discourse.jujucharms.com/t/charms-for-centos-lets-begin
         if 'centos' in series:
             check_call([pip, 'install', '-U', 'pyyaml'])
 
@@ -316,13 +318,14 @@ def apt_install(packages):
         else:
             break
 
+
 def yum_install(packages):
     """ Installs packages with yum.
         This function largely  mimics the apt_install function for consistency.
     """
     if packages:
         env = os.environ.copy()
-        cmd = ['yum','-y','install']
+        cmd = ['yum', '-y', 'install']
         for attempt in range(3):
             try:
                 check_call(cmd + packages, env=env)
@@ -338,6 +341,7 @@ def yum_install(packages):
                 break
     else:
         pass
+
 
 def init_config_states():
     import yaml
