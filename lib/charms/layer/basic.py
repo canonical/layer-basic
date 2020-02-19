@@ -146,7 +146,7 @@ def bootstrap_charm_deps():
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
                 series = get_series()
-                if series in ('precise', 'trusty'):
+                if series in ('ubuntu12.04', 'precise', 'ubuntu14.04', 'trusty'):
                     apt_install(['python-virtualenv'])
                 elif 'centos' in series:
                     yum_install(['python-virtualenv'])
