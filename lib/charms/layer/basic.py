@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import shutil
 from glob import glob
 from subprocess import check_call, check_output, CalledProcessError
@@ -9,14 +10,49 @@ from charms import layer
 from charms.layer.execd import execd_preinstall
 
 
-def lsb_release():
-    """Return /etc/lsb-release in a dict"""
-    d = {}
-    with open('/etc/lsb-release', 'r') as lsb:
-        for l in lsb:
-            k, v = l.split('=')
-            d[k.strip()] = v.strip()
-    return d
+def get_series():
+    """
+    Return series for a few known OS:es.
+    Tested as of 2019 november:
+    * centos6, centos7, rhel6.
+    * bionic
+    """
+    series = ""
+
+    # Looking for content in /etc/os-release
+    # works for ubuntu + some centos
+    if os.path.isfile('/etc/os-release'):
+        d = {}
+        with open('/etc/os-release', 'r') as rel:
+            for l in rel:
+                if not re.match(r'^\s*$', l):
+                    k, v = l.split('=')
+                    d[k.strip()] = v.strip().replace('"', '')
+            series = "{ID}{VERSION_ID}".format(**d)
+
+    # Looking for content in /etc/redhat-release
+    # works for redhat enterprise systems
+    elif os.path.isfile('/etc/redhat-release'):
+        with open('/etc/redhat-release', 'r') as redhatlsb:
+            # CentOS Linux release 7.7.1908 (Core)
+            line = redhatlsb.readline()
+            release = int(line.split("release")[1].split()[0][0])
+            series = "centos" + str(release)
+
+    # Looking for content in /etc/lsb-release
+    # works for ubuntu
+    elif os.path.isfile('/etc/lsb-release'):
+        d = {}
+        with open('/etc/lsb-release', 'r') as lsb:
+            for l in lsb:
+                k, v = l.split('=')
+                d[k.strip()] = v.strip()
+            series = d['DISTRIB_CODENAME']
+
+    # This is what happens if we cant figure out the OS.
+    else:
+        series = "unknown"
+    return series
 
 
 def bootstrap_charm_deps():
@@ -30,6 +66,30 @@ def bootstrap_charm_deps():
     # unless the operator has created and populated $JUJU_CHARM_DIR/exec.d.
     execd_preinstall()
     # ensure that $JUJU_CHARM_DIR/bin is on the path, for helper scripts
+
+    series = get_series()
+
+    # OMG?! is build-essentials needed?
+    ubuntu_packages = ['python3-pip',
+                       'python3-setuptools',
+                       'python3-yaml',
+                       'python3-dev',
+                       'python3-wheel',
+                       'build-essential']
+
+    # I'm not going to "yum group info "Development Tools"
+    # omitting above madness
+    centos_packages = ['python3-pip',
+                       'python3-setuptools',
+                       'python3-devel',
+                       'python3-wheel']
+
+    packages_needed = []
+    if 'centos' in series:
+        packages_needed = centos_packages
+    else:
+        packages_needed = ubuntu_packages
+
     charm_dir = os.environ['JUJU_CHARM_DIR']
     os.environ['PATH'] += ':%s' % os.path.join(charm_dir, 'bin')
     venv = os.path.abspath('../.venv')
@@ -71,24 +131,26 @@ def bootstrap_charm_deps():
                 "allow_hosts = ''\n",
                 "find_links = file://{}/wheelhouse/\n".format(charm_dir),
             ])
-        apt_install([
-            'python3-pip',
-            'python3-setuptools',
-            'python3-yaml',
-            'python3-dev',
-            'python3-wheel',
-            'build-essential',
-        ])
+        if 'centos' in series:
+            yum_install(packages_needed)
+        else:
+            apt_install(packages_needed)
         from charms.layer import options
         cfg = options.get('basic')
         # include packages defined in layer.yaml
-        apt_install(cfg.get('packages', []))
+        if 'centos' in series:
+            yum_install(cfg.get('packages', []))
+        else:
+            apt_install(cfg.get('packages', []))
         # if we're using a venv, set it up
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
-                series = lsb_release()['DISTRIB_CODENAME']
-                if series in ('precise', 'trusty'):
+                series = get_series()
+                if series in ('ubuntu12.04', 'precise',
+                              'ubuntu14.04', 'trusty'):
                     apt_install(['python-virtualenv'])
+                elif 'centos' in series:
+                    yum_install(['python-virtualenv'])
                 else:
                     apt_install(['virtualenv'])
                 cmd = ['virtualenv', '-ppython3', '--never-download', venv]
@@ -117,6 +179,13 @@ def bootstrap_charm_deps():
                    '-f', 'wheelhouse'] + glob('wheelhouse/*'))
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
+
+        # install pyyaml for centos7, since, unlike the ubuntu image, the
+        # default image for centos doesn't include pyyaml; see the discussion:
+        # https://discourse.jujucharms.com/t/charms-for-centos-lets-begin
+        if 'centos' in series:
+            check_call([pip, 'install', '-U', 'pyyaml'])
+
         # install python packages from layer options
         if cfg.get('python_packages'):
             check_call([pip, 'install', '-U'] + cfg.get('python_packages'))
@@ -249,6 +318,30 @@ def apt_install(packages):
             sleep(5)
         else:
             break
+
+
+def yum_install(packages):
+    """ Installs packages with yum.
+        This function largely  mimics the apt_install function for consistency.
+    """
+    if packages:
+        env = os.environ.copy()
+        cmd = ['yum', '-y', 'install']
+        for attempt in range(3):
+            try:
+                check_call(cmd + packages, env=env)
+            except CalledProcessError:
+                if attempt == 2:
+                    raise
+                try:
+                    check_call(['yum', 'update'])
+                except CalledProcessError:
+                    pass
+                sleep(5)
+            else:
+                break
+    else:
+        pass
 
 
 def init_config_states():
