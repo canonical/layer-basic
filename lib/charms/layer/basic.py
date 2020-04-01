@@ -2,6 +2,7 @@ import os
 import sys
 import re
 import shutil
+from distutils.version import LooseVersion
 from glob import glob
 from subprocess import check_call, check_output, CalledProcessError
 from time import sleep
@@ -165,27 +166,20 @@ def bootstrap_charm_deps():
             # from changing it
             if os.path.exists('/usr/bin/pip'):
                 shutil.copy2('/usr/bin/pip', '/usr/bin/pip.save')
-        pip_ver = check_output([pip, '--version']).decode('utf8').split()[1]
-        pip_major_ver = int(pip_ver.split('.')[0])
-        if pip_major_ver < 18:
-            # need newer pip, to fix spurious Double Requirement error:
-            # https://github.com/pypa/pip/issues/56
-            check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
-                        'pip'])
-            # per https://github.com/juju-solutions/layer-basic/issues/110
-            # this replaces the setuptools that was copied over from the system
-            # on venv create with latest setuptools and adds setuptools_scm
-            check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
-                        'setuptools', 'setuptools-scm'])
-        else:
-            # remove bundled pip and setuptools, since the bundled versions are
-            # older and downgrading can break things
-            wheels = glob('wheelhouse/pip*') + glob('wheelhouse/setuptools*')
-            for wheel in wheels:
-                os.remove(wheel)
-        # install the rest of the wheelhouse deps
+        pre_install_pkgs = ['pip', 'setuptools', 'setuptools-scm']
+        # we bundle these packages to work around bugs in older versions (such
+        # as https://github.com/pypa/pip/issues/56), but if the system already
+        # provided a newer version, downgrading it can cause other problems
+        _update_if_newer(pip, pre_install_pkgs)
+        # install the rest of the wheelhouse deps (extract the pkg names into
+        # a set so that we can ignore the pre-install packages and let pip
+        # choose the best version in case there are multiple from layer
+        # conflicts)
+        pkgs = {os.path.basename(wheel).split('-')[0].replace('_', '-')
+                for wheel in glob('wheelhouse/*')}
+        pkgs -= set(pre_install_pkgs)
         check_call([pip, 'install', '-U', '--ignore-installed', '--no-index',
-                   '-f', 'wheelhouse'] + glob('wheelhouse/*'))
+                   '-f', 'wheelhouse'] + list(pkgs))
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
 
@@ -227,6 +221,33 @@ def bootstrap_charm_deps():
         # Non-namespace-package libs (e.g., charmhelpers) are available
         # without having to reload the interpreter. :/
         reload_interpreter(vpy if cfg.get('use_venv') else sys.argv[0])
+
+
+def _load_installed_versions(pip):
+    pip_freeze = check_output([pip, 'freeze']).decode('utf8')
+    versions = {}
+    for pkg_ver in pip_freeze.splitlines():
+        pkg, ver = pkg_ver.split('==')
+        versions[pkg] = LooseVersion(ver)
+    return versions
+
+
+def _load_wheelhouse_versions():
+    versions = {}
+    for wheel in glob('wheelhouse/*'):
+        pkg, ver = os.path.basename(wheel).split('-')
+        # nb: LooseVersion ignores the file extension
+        versions[pkg] = LooseVersion(ver)
+    return versions
+
+
+def _update_if_newer(pip, pkgs):
+    installed = _load_installed_versions(pip)
+    wheelhouse = _load_wheelhouse_versions()
+    for pkg in pkgs:
+        if pkg not in installed or wheelhouse[pkg] > installed[pkg]:
+            check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
+                        pkg])
 
 
 def install_or_update_charm_env():
