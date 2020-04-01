@@ -33,21 +33,7 @@ script:
       sudo sh -c 'echo PATH=/snap/bin:$PATH >> /etc/environment';
       sudo lxd waitready;
       sudo lxd init --auto;
-      cat <<EOF> profile-update.yaml
-      config: {}
-      description: Default LXD profile - updated
-      devices:
-        eth0:
-          name: eth0
-          parent: lxdbr0
-          nictype: bridged
-          type: nic
-        root:
-          path: /
-          pool: default
-          type: disk
-      EOF
-      cat profile-update.yaml | sudo lxc profile edit default
+      cat .travis/profile-update.yaml | sudo lxc profile edit default
       sudo usermod -a -G lxd travis;
       sudo su - travis -c 'juju bootstrap --no-gui localhost';
     fi
