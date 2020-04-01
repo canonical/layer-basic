@@ -33,7 +33,7 @@ script:
       sudo sh -c 'echo PATH=/snap/bin:$PATH >> /etc/environment';
       sudo lxd waitready;
       sudo lxd init --auto;
-      cat .travis/profile-update.yaml | sudo lxc profile edit default
+      cat .travis/profile-update.yaml | sudo lxc profile edit default;
       sudo usermod -a -G lxd travis;
       sudo su - travis -c 'juju bootstrap --no-gui localhost';
     fi
