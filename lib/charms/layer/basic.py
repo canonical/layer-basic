@@ -165,15 +165,24 @@ def bootstrap_charm_deps():
             # from changing it
             if os.path.exists('/usr/bin/pip'):
                 shutil.copy2('/usr/bin/pip', '/usr/bin/pip.save')
-        # need newer pip, to fix spurious Double Requirement error:
-        # https://github.com/pypa/pip/issues/56
-        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
-                    'pip'])
-        # per https://github.com/juju-solutions/layer-basic/issues/110
-        # this replaces the setuptools that was copied over from the system on
-        # venv create with latest setuptools and adds setuptools_scm
-        check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
-                    'setuptools', 'setuptools-scm'])
+        pip_ver = check_output([pip, '--version']).decode('utf8').split()[1]
+        pip_major_ver = int(pip_ver.split('.')[0])
+        if pip_major_ver < 18:
+            # need newer pip, to fix spurious Double Requirement error:
+            # https://github.com/pypa/pip/issues/56
+            check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
+                        'pip'])
+            # per https://github.com/juju-solutions/layer-basic/issues/110
+            # this replaces the setuptools that was copied over from the system
+            # on venv create with latest setuptools and adds setuptools_scm
+            check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
+                        'setuptools', 'setuptools-scm'])
+        else:
+            # remove bundled pip and setuptools, since the bundled versions are
+            # older and downgrading can break things
+            wheels = glob('wheelhouse/pip*') + glob('wheelhouse/setuptools*')
+            for wheel in wheels:
+                os.remove(wheel)
         # install the rest of the wheelhouse deps
         check_call([pip, 'install', '-U', '--ignore-installed', '--no-index',
                    '-f', 'wheelhouse'] + glob('wheelhouse/*'))
