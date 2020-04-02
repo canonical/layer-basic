@@ -237,7 +237,7 @@ def _load_wheelhouse_versions():
     for wheel in glob('wheelhouse/*'):
         pkg, ver = os.path.basename(wheel).split('-')
         # nb: LooseVersion ignores the file extension
-        versions[pkg] = LooseVersion(ver)
+        versions[pkg.replace('_', '-')] = LooseVersion(ver)
     return versions
 
 
