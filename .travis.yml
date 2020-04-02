@@ -44,5 +44,5 @@ script:
     fi
 after_failure:
   - if [ $ENV = 'func' ]; then
-      sudo su travis -c 'for application in trusty xenial bionic cosmic disco; do juju ssh -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/) minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";done';
+      sudo su travis -c 'for application in trusty xenial bionic eoan focal; do juju ssh -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/) minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";done';
     fi
