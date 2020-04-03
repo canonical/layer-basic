@@ -175,9 +175,7 @@ def bootstrap_charm_deps():
         # a set so that we can ignore the pre-install packages and let pip
         # choose the best version in case there are multiple from layer
         # conflicts)
-        pkgs = {os.path.basename(wheel).split('-')[0].replace('_', '-')
-                for wheel in glob('wheelhouse/*')}
-        pkgs -= set(pre_install_pkgs)
+        pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
         check_call([pip, 'install', '-U', '--ignore-installed', '--no-index',
                    '-f', 'wheelhouse'] + list(pkgs))
         # re-enable installation from pypi
