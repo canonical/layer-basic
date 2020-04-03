@@ -1,0 +1,12 @@
+config: {}
+description: Default LXD profile - updated
+devices:
+  eth0:
+    name: eth0
+    parent: lxdbr0
+    nictype: bridged
+    type: nic
+  root:
+    path: /
+    pool: default
+    type: disk
