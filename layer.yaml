@@ -1,5 +1,5 @@
 includes: ['layer:options']
-exclude: ['.travis.yml', 'tests', 'tox.ini', 'test-requirements.txt']
+exclude: ['.travis.yml', 'tests', 'tox.ini', 'test-requirements.txt', 'unit_tests']
 defines:
   packages:
     type: array
