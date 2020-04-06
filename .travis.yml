@@ -17,11 +17,15 @@ matrix:
     - name: "Python 3.7"
       python: 3.7
       env: ENV=flake8,py3
+    - name: "Python 3.8"
+      python: 3.8
+      env: ENV=flake8,py3
     - name: "Functional test"
       env: ENV=func
 comment: |
   install dependencies in script phase saving time on simpler test environments
-  sudo back to ourself to activate lxd group membership executable search path
+  change permissions on lxd socket to allow travis user access
+  (^^ this is a throw-away CI environment, do not do this at home)
 script:
   - if [ $ENV = 'func' ]; then
       sudo apt update;
@@ -34,15 +38,14 @@ script:
       sudo lxd waitready;
       sudo lxd init --auto;
       cat .travis/profile-update.yaml | sudo lxc profile edit default;
-      sudo usermod -a -G lxd travis;
-      sudo su - travis -c 'juju bootstrap --no-gui localhost';
+      sudo chmod 666 /var/snap/lxd/common/lxd/unix.socket;
+      juju bootstrap --no-gui localhost;
     fi
-  - echo "export PATH=$PATH;cd $(pwd)" > $HOME/saved_path
-  - sudo su - travis -c "source $HOME/saved_path; tox -c tox.ini -e $ENV";
+  - travis_wait 50 tox -c tox.ini -e $ENV
   - if [ $ENV = 'func' ]; then
-      sudo su travis -c 'juju status -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/)';
+      juju status -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
     fi
 after_failure:
   - if [ $ENV = 'func' ]; then
-      sudo su travis -c 'for application in trusty xenial bionic eoan focal; do juju ssh -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/) minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";done';
+      for application in trusty xenial bionic eoan focal; do juju ssh -m $(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/) minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";done;
     fi

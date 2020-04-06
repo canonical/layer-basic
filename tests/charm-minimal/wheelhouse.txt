@@ -1,1 +1,2 @@
-cryptography
+# We add a wheel that needs to be built from source to validate that this works
+psycopg2
