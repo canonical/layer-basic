@@ -176,8 +176,8 @@ def bootstrap_charm_deps():
         # choose the best version in case there are multiple from layer
         # conflicts)
         pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
-        check_call([pip, 'install', '-U', '--ignore-installed', '--no-index',
-                   '-f', 'wheelhouse'] + list(pkgs))
+        check_call([pip, 'install', '-U', '--force-reinstall', '--no-index',
+                    '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs))
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
 
