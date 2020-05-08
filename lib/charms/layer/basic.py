@@ -182,8 +182,12 @@ def bootstrap_charm_deps():
         pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
         check_call([pip, 'install', '-U', '--force-reinstall', '--no-index',
                     '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs))
-        # re-enable installation from pypi
-        os.remove('/root/.pydistutils.cfg')
+        if series in ('ubuntu12.04', 'precise',
+                      'ubuntu14.04', 'trusty',
+                      'ubuntu16.04', 'xenial',
+                      'ubuntu18.04', 'bionic'):
+            # re-enable installation from pypi
+            os.remove('/root/.pydistutils.cfg')
 
         # install pyyaml for centos7, since, unlike the ubuntu image, the
         # default image for centos doesn't include pyyaml; see the discussion:
