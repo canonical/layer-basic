@@ -1,0 +1,12 @@
+name: minimal-no-venv
+summary: minimal charm used to functionally test layer-basic
+description: reactive charm with some tricky deps to test venv bootstrapping
+maintainer: Juju Developers <juju@lists.ubuntu.com>
+tags:
+  - CI
+series:
+  - trusty
+  - xenial
+  - bionic
+  - eoan
+  - focal

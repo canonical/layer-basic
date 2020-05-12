@@ -1,0 +1,4 @@
+includes: [layer:charm-minimal]
+options:
+  basic:
+    use_venv: false
