@@ -47,13 +47,13 @@ script:
     fi
 after_failure:
   - if [ $ENV = 'func' ]; then
-      model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/)
+      model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
       for application in trusty xenial bionic eoan focal; do
         if juju status -m $model minimal-${application} | grep -q error; then
-          juju ssh -m $model minimal-${application}/0 "sudo cat /var/log/juju/unit*.log"
-        fi
+          juju ssh -m $model minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";
+        fi;
         if juju status -m $model minimal-no-venv-${application} | grep -q error; then
-          juju ssh -m $model minimal-no-venv-${application}/0 "sudo cat /var/log/juju/unit*.log"
-        fi
+          juju ssh -m $model minimal-no-venv-${application}/0 "sudo cat /var/log/juju/unit*.log";
+        fi;
       done;
     fi
