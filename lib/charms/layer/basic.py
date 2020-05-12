@@ -180,12 +180,16 @@ def bootstrap_charm_deps():
         # choose the best version in case there are multiple from layer
         # conflicts)
         pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
-        check_call([pip, 'install', '-U', '--force-reinstall', '--no-index',
+        reinstall_flag = '--force-reinstall'
+        pre_eoan = series in ('ubuntu12.04', 'precise',
+                              'ubuntu14.04', 'trusty',
+                              'ubuntu16.04', 'xenial',
+                              'ubuntu18.04', 'bionic')
+        if not cfg.get('use_venv', True) and pre_eoan:
+            reinstall_flag = '--ignore-installed'
+        check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
                     '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs))
-        if series in ('ubuntu12.04', 'precise',
-                      'ubuntu14.04', 'trusty',
-                      'ubuntu16.04', 'xenial',
-                      'ubuntu18.04', 'bionic'):
+        if pre_eoan:
             # re-enable installation from pypi
             os.remove('/root/.pydistutils.cfg')
 
