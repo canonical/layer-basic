@@ -124,18 +124,20 @@ def bootstrap_charm_deps():
         open('wheelhouse/.upgrade', 'w').close()
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
-        if series in ('ubuntu12.04', 'precise',
-                      'ubuntu14.04', 'trusty',
-                      'ubuntu16.04', 'xenial',
-                      'ubuntu18.04', 'bionic'):
-            with open('/root/.pydistutils.cfg', 'w') as fp:
-                # make sure that easy_install also only uses the wheelhouse
-                # (see https://github.com/pypa/pip/issues/410)
-                fp.writelines([
-                    "[easy_install]\n",
-                    "allow_hosts = ''\n",
-                    "find_links = file://{}/wheelhouse/\n".format(charm_dir),
-                ])
+        pre_eoan = series in ('ubuntu12.04', 'precise',
+                              'ubuntu14.04', 'trusty',
+                              'ubuntu16.04', 'xenial',
+                              'ubuntu18.04', 'bionic')
+        pydistutils_lines = [
+            "[easy_install]\n",
+            "find_links = file://{}/wheelhouse/\n".format(charm_dir),
+        ]
+        if pre_eoan:
+            pydistutils_lines.append("allow_hosts = ''\n")
+        with open('/root/.pydistutils.cfg', 'w') as fp:
+            # make sure that easy_install also only uses the wheelhouse
+            # (see https://github.com/pypa/pip/issues/410)
+            fp.writelines(pydistutils_lines)
         if 'centos' in series:
             yum_install(packages_needed)
         else:
@@ -181,17 +183,12 @@ def bootstrap_charm_deps():
         # conflicts)
         pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
         reinstall_flag = '--force-reinstall'
-        pre_eoan = series in ('ubuntu12.04', 'precise',
-                              'ubuntu14.04', 'trusty',
-                              'ubuntu16.04', 'xenial',
-                              'ubuntu18.04', 'bionic')
         if not cfg.get('use_venv', True) and pre_eoan:
             reinstall_flag = '--ignore-installed'
         check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
                     '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs))
-        if pre_eoan:
-            # re-enable installation from pypi
-            os.remove('/root/.pydistutils.cfg')
+        # re-enable installation from pypi
+        os.remove('/root/.pydistutils.cfg')
 
         # install pyyaml for centos7, since, unlike the ubuntu image, the
         # default image for centos doesn't include pyyaml; see the discussion:
