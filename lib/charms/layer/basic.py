@@ -11,6 +11,12 @@ from charms import layer
 from charms.layer.execd import execd_preinstall
 
 
+def _get_subprocess_env():
+    env = os.environ.copy()
+    env['LANG'] = env.get('LANG', 'C.UTF-8')
+    return env
+
+
 def get_series():
     """
     Return series for a few known OS:es.
@@ -163,7 +169,7 @@ def bootstrap_charm_deps():
                 cmd = ['virtualenv', '-ppython3', '--never-download', venv]
                 if cfg.get('include_system_packages'):
                     cmd.append('--system-site-packages')
-                check_call(cmd)
+                check_call(cmd, env=_get_subprocess_env())
             os.environ['PATH'] = ':'.join([vbin, os.environ['PATH']])
             pip = vpip
         else:
@@ -186,7 +192,8 @@ def bootstrap_charm_deps():
         if not cfg.get('use_venv', True) and pre_eoan:
             reinstall_flag = '--ignore-installed'
         check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
-                    '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs))
+                    '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs),
+                   env=_get_subprocess_env())
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
 
@@ -194,11 +201,13 @@ def bootstrap_charm_deps():
         # default image for centos doesn't include pyyaml; see the discussion:
         # https://discourse.jujucharms.com/t/charms-for-centos-lets-begin
         if 'centos' in series:
-            check_call([pip, 'install', '-U', 'pyyaml'])
+            check_call([pip, 'install', '-U', 'pyyaml'],
+                       env=_get_subprocess_env())
 
         # install python packages from layer options
         if cfg.get('python_packages'):
-            check_call([pip, 'install', '-U'] + cfg.get('python_packages'))
+            check_call([pip, 'install', '-U'] + cfg.get('python_packages'),
+                       env=_get_subprocess_env())
         if not cfg.get('use_venv'):
             # restore system pip to prevent `pip3 install -U pip`
             # from changing it
@@ -254,7 +263,7 @@ def _update_if_newer(pip, pkgs):
     for pkg in pkgs:
         if pkg not in installed or wheelhouse[pkg] > installed[pkg]:
             check_call([pip, 'install', '-U', '--no-index', '-f', 'wheelhouse',
-                        pkg])
+                        pkg], env=_get_subprocess_env())
 
 
 def install_or_update_charm_env():
@@ -331,7 +340,7 @@ def apt_install(packages):
     if isinstance(packages, (str, bytes)):
         packages = [packages]
 
-    env = os.environ.copy()
+    env = _get_subprocess_env()
 
     if 'DEBIAN_FRONTEND' not in env:
         env['DEBIAN_FRONTEND'] = 'noninteractive'
@@ -348,7 +357,7 @@ def apt_install(packages):
                 raise
             try:
                 # sometimes apt-get update needs to be run
-                check_call(['apt-get', 'update'])
+                check_call(['apt-get', 'update'], env=env)
             except CalledProcessError:
                 # sometimes it's a dpkg lock issue
                 pass
@@ -371,7 +380,7 @@ def yum_install(packages):
                 if attempt == 2:
                     raise
                 try:
-                    check_call(['yum', 'update'])
+                    check_call(['yum', 'update'], env=env)
                 except CalledProcessError:
                     pass
                 sleep(5)
