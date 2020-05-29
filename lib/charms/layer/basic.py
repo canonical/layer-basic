@@ -156,6 +156,8 @@ def bootstrap_charm_deps():
                 if series in ('ubuntu12.04', 'precise',
                               'ubuntu14.04', 'trusty'):
                     apt_install(['python-virtualenv'])
+                elif series in ('ubuntu20.04', 'focal'):
+                    apt_install(['python3-virtualenv'])
                 elif 'centos' in series:
                     yum_install(['python-virtualenv'])
                 else:
