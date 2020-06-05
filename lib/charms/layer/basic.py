@@ -120,10 +120,19 @@ def bootstrap_charm_deps():
         if post_upgrade:
             os.unlink('wheelhouse/.upgrade')
         return
-    if is_series_upgrade and os.path.exists(venv):
-        # series upgrade should do a full clear of the venv, rather than just
-        # updating it, to bring in updates to Python itself
-        shutil.rmtree(venv)
+    if os.path.exists(venv):
+        try:
+            # focal installs or upgrades prior to PR 160 could leave the venv
+            # in a broken state which would prevent subsequent charm upgrades
+            _load_installed_versions(vpip)
+        except CalledProcessError:
+            is_broken_venv = True
+        else:
+            is_broken_venv = False
+        if is_series_upgrade or is_broken_venv:
+            # series upgrade should do a full clear of the venv, rather than
+            # just updating it, to bring in updates to Python itself
+            shutil.rmtree(venv)
     if is_upgrade:
         if os.path.exists('wheelhouse/.bootstrapped'):
             os.unlink('wheelhouse/.bootstrapped')
