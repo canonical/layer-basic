@@ -147,7 +147,9 @@ def bootstrap_charm_deps():
             "[easy_install]\n",
             "find_links = file://{}/wheelhouse/\n".format(charm_dir),
         ]
-        if pre_eoan:
+        setuptools_ver = _load_installed_versions('pip3').get('setuptools')
+        max_allow_hosts_ver = LooseVersion('42.0.0')
+        if not setuptools_ver or setuptools_ver < max_allow_hosts_ver:
             pydistutils_lines.append("allow_hosts = ''\n")
         with open('/root/.pydistutils.cfg', 'w') as fp:
             # make sure that easy_install also only uses the wheelhouse
