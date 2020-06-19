@@ -143,6 +143,17 @@ def bootstrap_charm_deps():
                               'ubuntu14.04', 'trusty',
                               'ubuntu16.04', 'xenial',
                               'ubuntu18.04', 'bionic')
+        if 'centos' in series:
+            yum_install(packages_needed)
+        else:
+            apt_install(packages_needed)
+        from charms.layer import options
+        cfg = options.get('basic')
+        # include packages defined in layer.yaml
+        if 'centos' in series:
+            yum_install(cfg.get('packages', []))
+        else:
+            apt_install(cfg.get('packages', []))
         pydistutils_lines = [
             "[easy_install]\n",
             "find_links = file://{}/wheelhouse/\n".format(charm_dir),
@@ -155,17 +166,6 @@ def bootstrap_charm_deps():
             # make sure that easy_install also only uses the wheelhouse
             # (see https://github.com/pypa/pip/issues/410)
             fp.writelines(pydistutils_lines)
-        if 'centos' in series:
-            yum_install(packages_needed)
-        else:
-            apt_install(packages_needed)
-        from charms.layer import options
-        cfg = options.get('basic')
-        # include packages defined in layer.yaml
-        if 'centos' in series:
-            yum_install(cfg.get('packages', []))
-        else:
-            apt_install(cfg.get('packages', []))
         # if we're using a venv, set it up
         if cfg.get('use_venv'):
             if not os.path.exists(venv):
