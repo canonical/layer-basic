@@ -146,6 +146,8 @@ def bootstrap_charm_deps():
         pydistutils_lines = [
             "[easy_install]\n",
             "find_links = file://{}/wheelhouse/\n".format(charm_dir),
+            "no_index=True\n",
+            "index_url=\n",   # deliberately nothing here; disables it.
         ]
         if pre_eoan:
             pydistutils_lines.append("allow_hosts = ''\n")
