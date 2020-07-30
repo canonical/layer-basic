@@ -31,6 +31,7 @@ script:
       sudo apt update;
       sudo apt install -y distro-info;
       sudo apt remove -y --purge lxd lxd-client;
+      sudo snap install core;
       sudo snap install lxd;
       sudo snap install juju --classic;
       sudo snap install charm --classic;
