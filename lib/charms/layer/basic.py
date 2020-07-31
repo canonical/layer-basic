@@ -3,6 +3,7 @@ import sys
 import re
 import shutil
 from distutils.version import LooseVersion
+from pkg_resources import Requirement
 from glob import glob
 from subprocess import check_call, check_output, CalledProcessError
 from time import sleep
@@ -254,8 +255,14 @@ def _load_installed_versions(pip):
     pip_freeze = check_output([pip, 'freeze']).decode('utf8')
     versions = {}
     for pkg_ver in pip_freeze.splitlines():
-        pkg, ver = pkg_ver.split('==')
-        versions[pkg] = LooseVersion(ver)
+        try:
+            req = Requirement(pkg_ver)
+        except ValueError:
+            continue
+        versions.update({
+            req.name: LooseVersion(_.version)
+            for _ in req.specifier if _.operator == '=='
+        })
     return versions
 
 
