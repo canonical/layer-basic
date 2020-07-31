@@ -11,10 +11,6 @@ applications:
     series: bionic
     charm: /tmp/charm-builds/minimal
     num_units: 1
-  minimal-eoan:
-    series: eoan
-    charm: /tmp/charm-builds/minimal
-    num_units: 1
   minimal-focal:
     series: focal
     charm: /tmp/charm-builds/minimal
@@ -29,10 +25,6 @@ applications:
     num_units: 1
   minimal-no-venv-bionic:
     series: bionic
-    charm: /tmp/charm-builds/minimal-no-venv
-    num_units: 1
-  minimal-no-venv-eoan:
-    series: eoan
     charm: /tmp/charm-builds/minimal-no-venv
     num_units: 1
   minimal-no-venv-focal:
