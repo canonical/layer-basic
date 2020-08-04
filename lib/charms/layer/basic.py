@@ -256,12 +256,12 @@ def _load_installed_versions(pip):
     versions = {}
     for pkg_ver in pip_freeze.splitlines():
         try:
-            req = Requirement(pkg_ver)
+            req = Requirement.parse(pkg_ver)
         except ValueError:
             continue
         versions.update({
-            req.name: LooseVersion(_.version)
-            for _ in req.specifier if _.operator == '=='
+            req.project_name: LooseVersion(ver)
+            for op, ver in req.specs if op == '=='
         })
     return versions
 
