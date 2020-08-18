@@ -130,8 +130,8 @@ def bootstrap_charm_deps():
             is_broken_venv = True
         else:
             is_broken_venv = False
-        if is_series_upgrade or is_broken_venv:
-            # series upgrade should do a full clear of the venv, rather than
+        if is_upgrade or is_broken_venv:
+            # All upgrades should do a full clear of the venv, rather than
             # just updating it, to bring in updates to Python itself
             shutil.rmtree(venv)
     if is_upgrade:
