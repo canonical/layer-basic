@@ -108,8 +108,9 @@ def bootstrap_charm_deps():
     is_bootstrapped = os.path.exists('wheelhouse/.bootstrapped')
     is_charm_upgrade = hook_name == 'upgrade-charm'
     is_series_upgrade = hook_name == 'post-series-upgrade'
-    post_upgrade = os.path.exists('wheelhouse/.upgrade')
-    is_upgrade = not post_upgrade and (is_charm_upgrade or is_series_upgrade)
+    is_post_upgrade = os.path.exists('wheelhouse/.upgraded')
+    is_upgrade = (not is_post_upgrade and
+                  (is_charm_upgrade or is_series_upgrade))
     if is_bootstrapped and not is_upgrade:
         # older subordinates might have downgraded charm-env, so we should
         # restore it if necessary
@@ -118,8 +119,8 @@ def bootstrap_charm_deps():
         # the .upgrade file prevents us from getting stuck in a loop
         # when re-execing to activate the venv; at this point, we've
         # activated the venv, so it's safe to clear it
-        if post_upgrade:
-            os.unlink('wheelhouse/.upgrade')
+        if is_post_upgrade:
+            os.unlink('wheelhouse/.upgraded')
         return
     if os.path.exists(venv):
         try:
@@ -137,7 +138,6 @@ def bootstrap_charm_deps():
     if is_upgrade:
         if os.path.exists('wheelhouse/.bootstrapped'):
             os.unlink('wheelhouse/.bootstrapped')
-        open('wheelhouse/.upgrade', 'w').close()
     # bootstrap wheelhouse
     if os.path.exists('wheelhouse'):
         pre_eoan = series in ('ubuntu12.04', 'precise',
@@ -244,6 +244,9 @@ def bootstrap_charm_deps():
         os.symlink('/usr/local/sbin/layer_option', 'bin/layer_option')
         # flag us as having already bootstrapped so we don't do it again
         open('wheelhouse/.bootstrapped', 'w').close()
+        if is_upgrade:
+            # flag us as having already upgraded so we don't do it again
+            open('wheelhouse/.upgraded', 'w').close()
         # Ensure that the newly bootstrapped libs are available.
         # Note: this only seems to be an issue with namespace packages.
         # Non-namespace-package libs (e.g., charmhelpers) are available
