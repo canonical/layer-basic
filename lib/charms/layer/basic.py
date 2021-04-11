@@ -199,7 +199,13 @@ def bootstrap_charm_deps():
         # a set so that we can ignore the pre-install packages and let pip
         # choose the best version in case there are multiple from layer
         # conflicts)
-        pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
+        _versions = _load_wheelhouse_versions()
+        _pkgs = _versions.keys() - set(pre_install_pkgs)
+        # add back the versions such that each package in pkgs is
+        # <package_name>==<version>.
+        # This ensures that pip 20.3.4+ will install the packages from the
+        # wheelhouse without (erroneously) flagging an error.
+        pkgs = _add_back_versions(_pkgs, _versions)
         reinstall_flag = '--force-reinstall'
         if not cfg.get('use_venv', True) and pre_eoan:
             reinstall_flag = '--ignore-installed'
@@ -276,6 +282,29 @@ def _load_wheelhouse_versions():
         # nb: LooseVersion ignores the file extension
         versions[pkg.replace('_', '-')] = LooseVersion(ver)
     return versions
+
+
+def _add_back_versions(pkgs, _versions):
+    """Add back the version strings to each of the packages.
+
+    The versions are LooseVersion() from _load_wheelhouse_versions().  This
+    function strips the ".zip" or ".tar.gz" from the end of the version string
+    and adds it back to the package in the form of <package_name>==<version>
+    """
+    def _strip_ext(s):
+        _s = str(s)
+        for ending in [".zip", ".tar.gz"]:
+            if _s.endswith(ending):
+                return _s[:-len(ending)]
+        return _s
+
+    def _maybe_make_version(k):
+        try:
+            return "{}=={}".format(k, _strip_ext(_versions[k]))
+        except KeyError:
+            return k
+
+    return [_maybe_make_version(k) for k in pkgs]
 
 
 def _update_if_newer(pip, pkgs):
