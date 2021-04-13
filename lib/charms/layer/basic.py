@@ -284,27 +284,53 @@ def _load_wheelhouse_versions():
     return versions
 
 
-def _add_back_versions(pkgs, _versions):
+def _add_back_versions(pkgs, versions):
     """Add back the version strings to each of the packages.
 
     The versions are LooseVersion() from _load_wheelhouse_versions().  This
     function strips the ".zip" or ".tar.gz" from the end of the version string
     and adds it back to the package in the form of <package_name>==<version>
+
+    If a package name is not a key in the versions dictionary, then it is
+    returned in the list unchanged.
+
+    :param pkgs: A list of package names
+    :type pkgs: List[str]
+    :param versions: A map of package to LooseVersion
+    :type versions: Dict[str, LooseVersion]
+    :returns: A list of (maybe) versioned packages
+    :rtype: List[str]
     """
     def _strip_ext(s):
-        _s = str(s)
+        """Strip an extension (if it exists) from the string
+
+        :param s: the string to strip an extension off if it exists
+        :type s: str
+        :returns: string without an extension of .zip or .tar.gz
+        :rtype: str
+        """
         for ending in [".zip", ".tar.gz"]:
-            if _s.endswith(ending):
-                return _s[:-len(ending)]
-        return _s
+            if s.endswith(ending):
+                return s[:-len(ending)]
+        return s
 
-    def _maybe_make_version(k):
+    def _maybe_add_version(pkg):
+        """Maybe add back the version number to a package if it exists.
+
+        Adds the version number, if the package exists in the lexically
+        captured `versions` dictionary, in the form <pkg>==<version>.  Strips
+        the extension if it exists.
+
+        :param pkg: the package name to (maybe) add the version number to.
+        :type pkg: str
+        """
         try:
-            return "{}=={}".format(k, _strip_ext(_versions[k]))
+            return "{}=={}".format(pkg, _strip_ext(str(versions[pkg])))
         except KeyError:
-            return k
+            pass
+        return pkg
 
-    return [_maybe_make_version(k) for k in pkgs]
+    return [_maybe_add_version(pkg) for pkg in pkgs]
 
 
 def _update_if_newer(pip, pkgs):
