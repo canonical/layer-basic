@@ -199,7 +199,13 @@ def bootstrap_charm_deps():
         # a set so that we can ignore the pre-install packages and let pip
         # choose the best version in case there are multiple from layer
         # conflicts)
-        pkgs = _load_wheelhouse_versions().keys() - set(pre_install_pkgs)
+        _versions = _load_wheelhouse_versions()
+        _pkgs = _versions.keys() - set(pre_install_pkgs)
+        # add back the versions such that each package in pkgs is
+        # <package_name>==<version>.
+        # This ensures that pip 20.3.4+ will install the packages from the
+        # wheelhouse without (erroneously) flagging an error.
+        pkgs = _add_back_versions(_pkgs, _versions)
         reinstall_flag = '--force-reinstall'
         if not cfg.get('use_venv', True) and pre_eoan:
             reinstall_flag = '--ignore-installed'
@@ -276,6 +282,55 @@ def _load_wheelhouse_versions():
         # nb: LooseVersion ignores the file extension
         versions[pkg.replace('_', '-')] = LooseVersion(ver)
     return versions
+
+
+def _add_back_versions(pkgs, versions):
+    """Add back the version strings to each of the packages.
+
+    The versions are LooseVersion() from _load_wheelhouse_versions().  This
+    function strips the ".zip" or ".tar.gz" from the end of the version string
+    and adds it back to the package in the form of <package_name>==<version>
+
+    If a package name is not a key in the versions dictionary, then it is
+    returned in the list unchanged.
+
+    :param pkgs: A list of package names
+    :type pkgs: List[str]
+    :param versions: A map of package to LooseVersion
+    :type versions: Dict[str, LooseVersion]
+    :returns: A list of (maybe) versioned packages
+    :rtype: List[str]
+    """
+    def _strip_ext(s):
+        """Strip an extension (if it exists) from the string
+
+        :param s: the string to strip an extension off if it exists
+        :type s: str
+        :returns: string without an extension of .zip or .tar.gz
+        :rtype: str
+        """
+        for ending in [".zip", ".tar.gz"]:
+            if s.endswith(ending):
+                return s[:-len(ending)]
+        return s
+
+    def _maybe_add_version(pkg):
+        """Maybe add back the version number to a package if it exists.
+
+        Adds the version number, if the package exists in the lexically
+        captured `versions` dictionary, in the form <pkg>==<version>.  Strips
+        the extension if it exists.
+
+        :param pkg: the package name to (maybe) add the version number to.
+        :type pkg: str
+        """
+        try:
+            return "{}=={}".format(pkg, _strip_ext(str(versions[pkg])))
+        except KeyError:
+            pass
+        return pkg
+
+    return [_maybe_add_version(pkg) for pkg in pkgs]
 
 
 def _update_if_newer(pip, pkgs):
