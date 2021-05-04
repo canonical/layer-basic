@@ -1,0 +1,48 @@
+name: Test Suite
+on: [pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.5, 3.6, 3.7, 3.8, 3.9]
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install Dependencies
+      run: |
+        pip install tox
+    - name: Run lint
+      run: tox -e flake8
+  functional-test:
+    name: Functional test with LXD
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Dependencies
+        run: |
+          pip install tox
+      - name: Setup operator environment
+        uses: charmed-kubernetes/actions-operator@master
+      - name: Run test
+        run: tox -e func
+      - name: Show Status
+        run: |
+          model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
+          juju status -m "$model"
+      - name: Show Error Logs
+        run: |
+          model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
+          juju debug-log -m "$model" --replay --no-tail --level ERROR
