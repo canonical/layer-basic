@@ -68,4 +68,3 @@ jobs:
               juju ssh -m $model minimal-no-venv-${application}/0 "sudo cat /var/log/juju/unit*.log";
             fi;
           done;
-        fi
