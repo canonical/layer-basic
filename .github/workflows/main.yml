@@ -1,0 +1,71 @@
+name: Test Suite
+on: [pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install Dependencies
+      run: |
+        pip install tox
+    - name: Run lint
+      run: tox -e lint
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install Dependencies
+        run: |
+          pip install tox
+      - name: Run test
+        run: tox -e unit
+  integration-test:
+    name: Functional test with LXD
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Dependencies
+        run: |
+          pip install tox
+      - name: Setup operator environment
+        uses: charmed-kubernetes/actions-operator@master
+      - name: Run test
+        run: tox -e func
+      - name: Collect Logs
+        if: ${{ failure() }}
+        run: |
+          model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
+          for application in trusty xenial bionic eoan focal; do
+            if juju status -m $model minimal-${application} | grep -q error; then
+              juju ssh -m $model minimal-${application}/0 "sudo cat /var/log/juju/unit*.log";
+            fi;
+            if juju status -m $model minimal-no-venv-${application} | grep -q error; then
+              juju ssh -m $model minimal-no-venv-${application}/0 "sudo cat /var/log/juju/unit*.log";
+            fi;
+          done;
+        fi
