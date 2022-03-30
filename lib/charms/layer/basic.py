@@ -201,17 +201,25 @@ def bootstrap_charm_deps():
         # conflicts)
         _versions = _load_wheelhouse_versions()
         _pkgs = _versions.keys() - set(pre_install_pkgs)
-        # add back the versions such that each package in pkgs is
-        # <package_name>==<version>.
-        # This ensures that pip 20.3.4+ will install the packages from the
-        # wheelhouse without (erroneously) flagging an error.
-        pkgs = _add_back_versions(_pkgs, _versions)
-        reinstall_flag = '--force-reinstall'
-        if not cfg.get('use_venv', True) and pre_eoan:
-            reinstall_flag = '--ignore-installed'
-        check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
-                    '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs),
-                   env=_get_subprocess_env())
+        # Jinja2 3+ relies on MarkupSafe actually being installed prior to
+        # attempting to be installed from the wheelhouse.  Thus, if MarkupSafe
+        # and/or wheel are in _pkgs, then install them first.
+        _pre_packages = [p for p in _pkgs if p in ('wheel', 'MarkupSafe')]
+        _pkgs = [p for p in _pkgs if p not in _pre_packages]
+        for _pkgs_set in (_pre_packages, _pkgs):
+            # add back the versions such that each package in pkgs is
+            # <package_name>==<version>.
+            # This ensures that pip 20.3.4+ will install the packages from the
+            # wheelhouse without (erroneously) flagging an error.
+            pkgs = _add_back_versions(_pkgs_set, _versions)
+            reinstall_flag = '--force-reinstall'
+            # if not cfg.get('use_venv', True) and pre_eoan:
+            if not cfg.get('use_venv', True):
+                reinstall_flag = '--ignore-installed'
+            check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
+                        '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs),
+                        # '-f', 'wheelhouse'] + list(pkgs),
+                       env=_get_subprocess_env())
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
 
