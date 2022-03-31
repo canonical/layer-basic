@@ -218,7 +218,6 @@ def bootstrap_charm_deps():
                 reinstall_flag = '--ignore-installed'
             check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
                         '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs),
-                        # '-f', 'wheelhouse'] + list(pkgs),
                        env=_get_subprocess_env())
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
