@@ -1,3 +1,5 @@
+# Disable all bundles that aren't 'latest', currently focal
+# See readme for details
 applications:
   #minimal-trusty:
     #series: trusty
