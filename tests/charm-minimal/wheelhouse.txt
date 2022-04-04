@@ -1,2 +1,3 @@
 # We add a wheel that needs to be built from source to validate that this works
-psycopg2
+psycopg2;python_version < '3.8'
+psycopg;python_version >= '3.8'

@@ -1,2 +1,3 @@
-charm-tools
+# Use latest so that layer-basic tests against main branch
+git+https://github.com/juju/charm-tools.git#egg=charm-tools
 git+https://github.com/openstack-charmers/zaza.git#egg=zaza

@@ -1,16 +1,29 @@
 # pip is pinned to <19.0 to avoid https://github.com/pypa/pip/issues/6164
 # even with installing setuptools before upgrading pip ends up with pip seeing
 # the older setuptools at the system level if include_system_packages is true
-pip>=18.1,<19.0
+pip>=18.1,<19.0;python_version < '3.8'
+pip;python_version >= '3.8'
 # pin Jinja2, PyYAML and MarkupSafe to the last versions supporting python 3.5
 # for trusty
-Jinja2<=2.10.1
-PyYAML<=5.2
-MarkupSafe<2.0.0
-setuptools<42
-setuptools-scm<=1.17.0
-charmhelpers>=0.4.0,<1.0.0
+Jinja2==2.10;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
+Jinja2==2.11;python_version == '2.7' or python_version == '3.5'  # py27, py35
+Jinja2;python_version >= '3.6' # py36 and on
+
+PyYAML==5.2;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
+PyYAML<5.4;python_version == '2.7' or python_version >= '3.5'  # all else
+
+MarkupSafe<2.0.0;python_version < '3.6'
+MarkupSafe<2.1.0;python_version == '3.6' # Just for python 3.6
+MarkupSafe;python_version >= '3.7' # newer pythons
+
+setuptools<42;python_version < '3.8'
+setuptools;python_version >= '3.8'
+setuptools-scm<=1.17.0;python_version < '3.8'
+setuptools-scm;python_version >= '3.8'
+flit_core;python_version >= '3.8'
+charmhelpers>=0.4.0,<2.0.0
 charms.reactive>=0.1.0,<2.0.0
-wheel<0.34
+wheel<0.34;python_version < '3.8'
+wheel;python_version >= '3.8'
 # pin netaddr to avoid pulling importlib-resources
 netaddr<=0.7.19
