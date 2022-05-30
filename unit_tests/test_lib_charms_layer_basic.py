@@ -1,5 +1,6 @@
 import os
 import mock
+import subprocess
 
 import lib.charms.layer.basic as basic
 
@@ -64,3 +65,20 @@ ignored>=1.2.3
             mock.call('3.2'),
             mock.call('4.3.2'),
         ], any_order=False)
+
+    @mock.patch('lib.charms.layer.basic.check_call')
+    @mock.patch('lib.charms.layer.basic.sleep')
+    def test__apt_install(self, sleep, check_call):
+        def fake_check_call(*args, **kwargs):
+            raise subprocess.CalledProcessError(basic.APT_NO_LOCK, ['apt-get'])
+
+        check_call.side_effect = fake_check_call
+        self.assertRaises(subprocess.CalledProcessError,
+                          basic.apt_install, ["coreutils"])
+        self.assertEqual(len(check_call.mock_calls),
+                         # `apt-get install` and `apt-get update` are run, but
+                         # in the last iteration `apt-get update` is not
+                         # executed.
+                         basic.CMD_RETRY_COUNT * 2 - 1)
+        sleep.assert_called_with(basic.CMD_RETRY_DELAY)
+        self.assertEqual(len(sleep.mock_calls), basic.CMD_RETRY_COUNT - 1)
