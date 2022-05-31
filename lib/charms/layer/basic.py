@@ -12,6 +12,11 @@ from charms import layer
 from charms.layer.execd import execd_preinstall
 
 
+APT_NO_LOCK = 100  # The return code for "couldn't acquire lock" in APT.
+CMD_RETRY_DELAY = 10  # Wait 10 seconds between command retries.
+CMD_RETRY_COUNT = 10  # Retry a failing fatal command X times.
+
+
 def _get_subprocess_env():
     env = os.environ.copy()
     env['LANG'] = env.get('LANG', 'C.UTF-8')
@@ -432,11 +437,11 @@ def apt_install(packages):
            '--option=Dpkg::Options::=--force-confold',
            '--assume-yes',
            'install']
-    for attempt in range(3):
+    for attempt in range(CMD_RETRY_COUNT):
         try:
             check_call(cmd + packages, env=env)
         except CalledProcessError:
-            if attempt == 2:  # third attempt
+            if attempt == (CMD_RETRY_COUNT - 1):  # last attempt
                 raise
             try:
                 # sometimes apt-get update needs to be run
@@ -444,7 +449,7 @@ def apt_install(packages):
             except CalledProcessError:
                 # sometimes it's a dpkg lock issue
                 pass
-            sleep(5)
+            sleep(CMD_RETRY_DELAY)
         else:
             break
 
