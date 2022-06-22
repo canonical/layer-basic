@@ -21,7 +21,8 @@ setuptools<42;python_version < '3.8'
 # https://github.com/juju-solutions/layer-basic/issues/201
 setuptools<62.2.0;python_version >= '3.8'
 setuptools-scm<=1.17.0;python_version < '3.8'
-setuptools-scm;python_version >= '3.8'
+# https://github.com/pypa/setuptools_scm/issues/722
+setuptools-scm<7;python_version >= '3.8'
 flit_core;python_version >= '3.8'
 charmhelpers>=0.4.0,<2.0.0
 charms.reactive>=0.1.0,<2.0.0
