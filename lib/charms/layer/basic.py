@@ -221,6 +221,8 @@ def bootstrap_charm_deps():
             # if not cfg.get('use_venv', True) and pre_eoan:
             if not cfg.get('use_venv', True):
                 reinstall_flag = '--ignore-installed'
+            if not pkgs:
+                continue
             check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
                         '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs),
                        env=_get_subprocess_env())
@@ -290,7 +292,18 @@ def _load_installed_versions(pip):
 def _load_wheelhouse_versions():
     versions = {}
     for wheel in glob('wheelhouse/*'):
-        pkg, ver = os.path.basename(wheel).rsplit('-', 1)
+        if wheel.endswith('.whl'):
+            # The binary wheel package format has a more stringent definition
+            # of how the filenames are formulated. As such we can safely
+            # extract the exact version string and store that.
+            #
+            # Reference:
+            # PEP 427 https://peps.python.org/pep-0427/#file-name-convention
+            # 'setuptools_scm-6.4.2-py3-none-any.whl'.split('-', 2) ==
+            #     ['setuptools_scm', '6.4.2', 'py3-none-any.whl']
+            pkg, ver, _ = os.path.basename(wheel).split('-', 2)
+        else:
+            pkg, ver = os.path.basename(wheel).rsplit('-', 1)
         # nb: LooseVersion ignores the file extension
         versions[pkg.replace('_', '-')] = LooseVersion(ver)
     return versions

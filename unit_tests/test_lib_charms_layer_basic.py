@@ -11,25 +11,58 @@ from unittest.mock import patch
 
 class TestLayerBasic(test_utils.BaseTestCase):
 
+    wheelhouse_glob = [
+        'python-dateutil-2.8.1.tar.gz',
+        'setuptools_scm-1.17.0.tar.gz',
+        'wheel-0.33.6.tar.gz',
+        'cffi-1.15.1'
+        '-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl',
+        'flit_core-3.7.1-py3-none-any.whl',
+    ]
+
     def test__load_wheelhouse_versions(self):
         self.patch_object(basic, 'glob')
         self.patch_object(basic, 'LooseVersion')
-        self.glob.return_value = [
-            'python-dateutil-2.8.1.tar.gz',
-            'setuptools_scm-1.17.0.tar.gz',
-            'wheel-0.33.6.tar.gz',
-        ]
+        self.glob.return_value = self.wheelhouse_glob
         self.assertDictEqual(
             basic._load_wheelhouse_versions(), {
                 'setuptools-scm': mock.ANY,
                 'python-dateutil': mock.ANY,
                 'wheel': mock.ANY,
+                'cffi': mock.ANY,
+                'flit-core': mock.ANY,
             })
         self.LooseVersion.assert_has_calls([
             mock.call('0.33.6.tar.gz'),
             mock.call('2.8.1.tar.gz'),
             mock.call('1.17.0.tar.gz'),
+            mock.call('1.15.1'),
+            mock.call('3.7.1'),
         ], any_order=True)
+        self.assertEqual(
+            self.LooseVersion.call_count,
+            5)
+
+    def test__add_back_versions(self):
+        self.patch_object(basic, 'glob')
+        self.glob.return_value = self.wheelhouse_glob
+        self.assertEqual(
+            basic._add_back_versions(
+                [
+                    'python-dateutil',
+                    'setuptools-scm',
+                    'wheel',
+                    'cffi',
+                    'flit-core',
+                ],
+                basic._load_wheelhouse_versions()),
+            [
+                'python-dateutil==2.8.1',
+                'setuptools-scm==1.17.0',
+                'wheel==0.33.6',
+                'cffi==1.15.1',
+                'flit-core==3.7.1'
+            ])
 
     @patch.dict('os.environ', {'LANG': 'su_SU.UTF-8'})
     def test__get_subprocess_env_lang_set(self):
