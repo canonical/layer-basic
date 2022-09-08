@@ -1,32 +1,20 @@
-# pip is pinned to <19.0 to avoid https://github.com/pypa/pip/issues/6164
-# even with installing setuptools before upgrading pip ends up with pip seeing
-# the older setuptools at the system level if include_system_packages is true
-pip>=18.1,<19.0;python_version < '3.8'
-# https://github.com/juju-solutions/layer-basic/issues/201
-pip<22.1;python_version >= '3.8'
-# pin Jinja2, PyYAML and MarkupSafe to the last versions supporting python 3.5
-# for trusty
-Jinja2==2.10;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
-Jinja2==2.11;python_version == '2.7' or python_version == '3.5'  # py27, py35
-Jinja2;python_version >= '3.6' # py36 and on
+# common bootstrap
+pip<23
+setuptools<65
+setuptools-scm<8
+wheel<0.38
 
-PyYAML==5.2;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
-PyYAML<5.4;python_version == '2.7' or python_version >= '3.5'  # all else
+# common build dependencies for install-from-source-on-target approach
+#
+# these are unfortunately required because `pip download` does not support
+# automatic discovery of build dependencies (ref pypa/pip#7863).
+#
+# building the charms with binary wheels (ref juju/charm-tools#620) would
+# relieve us from having to track theese manually.
+cython<0.30
+flit_core<4
 
-MarkupSafe<2.0.0;python_version < '3.6'
-MarkupSafe<2.1.0;python_version == '3.6' # Just for python 3.6
-MarkupSafe;python_version >= '3.7' # newer pythons
-
-setuptools<42;python_version < '3.8'
-# https://github.com/juju-solutions/layer-basic/issues/201
-setuptools<62.2.0;python_version >= '3.8'
-setuptools-scm<=1.17.0;python_version < '3.8'
-# https://github.com/pypa/setuptools_scm/issues/722
-setuptools-scm<7;python_version >= '3.8'
-flit_core;python_version >= '3.8'
+# common dependencies for all reactive charms
 charmhelpers>=0.4.0,<2.0.0
 charms.reactive>=0.1.0,<2.0.0
-wheel<0.34;python_version < '3.8'
-wheel;python_version >= '3.8'
-# pin netaddr to avoid pulling importlib-resources
-netaddr<=0.7.19
+
