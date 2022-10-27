@@ -19,7 +19,8 @@ MarkupSafe<2.0.0;python_version < '3.6'
 MarkupSafe<2.1.0;python_version >= '3.6' and python_version <= '3.8' # py38, focal
 MarkupSafe;python_version > '3.8'
 
-setuptools<42;python_version <= '3.8'
+setuptools<42;python_version < '3.8'
+setuptools<46.0.0;python_version == '3.8'
 setuptools;python_version > '3.8'
 setuptools-scm<=1.17.0;python_version <= '3.8'
 setuptools-scm;python_version > '3.8'
