@@ -6,16 +6,17 @@ pip>=18.1,<19.0;python_version < '3.8'
 pip<22.1;python_version >= '3.8'
 # pin Jinja2, PyYAML and MarkupSafe to the last versions supporting python 3.5
 # for trusty
-Jinja2==2.10;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
-Jinja2==2.11;python_version == '2.7' or python_version == '3.5'  # py27, py35
-Jinja2;python_version >= '3.6' # py36 and on
+Jinja2<2.11;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
+Jinja2<3.0;python_version == '2.7' or  python_version == '3.5' # py27, py35 xenial
+Jinja2<3.0;python_version >= '3.6' and python_version <= '3.8' # py36 bionic, py38 focal
+Jinja2;python_version > '3.8'
 
 PyYAML==5.2;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
 PyYAML<5.4;python_version == '2.7' or python_version >= '3.5'  # all else
 
 MarkupSafe<2.0.0;python_version < '3.6'
-MarkupSafe<2.1.0;python_version == '3.6' # Just for python 3.6
-MarkupSafe;python_version >= '3.7' # newer pythons
+MarkupSafe<2.1.0;python_version >= '3.6' and python_version <= '3.8' # py36 bionic, py38 focal
+MarkupSafe;python_version > '3.8'
 
 setuptools<42;python_version < '3.8'
 # https://github.com/juju-solutions/layer-basic/issues/201
