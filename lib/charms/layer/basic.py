@@ -2,10 +2,13 @@ import os
 import sys
 import re
 import shutil
+from contextlib import contextmanager
+from collections import defaultdict
 from distutils.version import LooseVersion
-from pkg_resources import Requirement
+from pkg_resources import Requirement, parse_requirements
 from glob import glob
 from subprocess import check_call, check_output, CalledProcessError
+from tempfile import NamedTemporaryFile
 from time import sleep
 
 from charms import layer
@@ -217,15 +220,29 @@ def bootstrap_charm_deps():
             # This ensures that pip 20.3.4+ will install the packages from the
             # wheelhouse without (erroneously) flagging an error.
             pkgs = _add_back_versions(_pkgs_set, _versions)
-            reinstall_flag = '--force-reinstall'
-            # if not cfg.get('use_venv', True) and pre_eoan:
-            if not cfg.get('use_venv', True):
-                reinstall_flag = '--ignore-installed'
-            if not pkgs:
-                continue
-            check_call([pip, 'install', '-U', reinstall_flag, '--no-index',
-                        '--no-cache-dir', '-f', 'wheelhouse'] + list(pkgs),
-                       env=_get_subprocess_env())
+            with _marked_requirements(pkgs) as marked_file:
+                reinstall_flag = '--force-reinstall'
+                # if not cfg.get('use_venv', True) and pre_eoan:
+                if not cfg.get('use_venv', True):
+                    reinstall_flag = '--ignore-installed'
+                if not pkgs:
+                    continue
+                check_call(
+                    [
+                        pip,
+                        'install',
+                        '-U',
+                        reinstall_flag,
+                        '--no-index',
+                        '--no-cache-dir',
+                        '-f',
+                        'wheelhouse',
+                        '-r',
+                        marked_file
+                    ],
+                    env=_get_subprocess_env()
+                )
+
         # re-enable installation from pypi
         os.remove('/root/.pydistutils.cfg')
 
@@ -356,6 +373,30 @@ def _add_back_versions(pkgs, versions):
         return pkg
 
     return [_maybe_add_version(pkg) for pkg in pkgs]
+
+
+@contextmanager
+def _marked_requirements(pkgs):
+    """Apply and custom markers from wheelhouse.txt to list of packages."""
+    wheelhouse_reqs = defaultdict(list)
+    with open("wheelhouse.txt") as wheelhouse:
+        for req in parse_requirements(wheelhouse.read()):
+            wheelhouse_reqs[req.project_name].append(req)
+
+    reqs = [
+        str(mark) + "\n"
+        for pkg in pkgs
+        for mark in wheelhouse_reqs.get(
+            # use each matching marker by project_name
+            Requirement(pkg).project_name,
+            # or default to using the incoming pkg
+            [pkg]
+        )
+    ]
+    with NamedTemporaryFile(mode='w') as requirements:
+        requirements.writelines(reqs)
+        requirements.flush()
+        yield requirements.name
 
 
 def _update_if_newer(pip, pkgs):
