@@ -377,7 +377,7 @@ def _add_back_versions(pkgs, versions):
 
 @contextmanager
 def _marked_requirements(pkgs):
-    """Apply and custom markers from wheelhouse.txt to list of packages."""
+    """Apply any custom markers from wheelhouse.txt to list of packages."""
     wheelhouse_reqs = defaultdict(list)
     with open("wheelhouse.txt") as wheelhouse:
         for req in parse_requirements(wheelhouse.read()):
