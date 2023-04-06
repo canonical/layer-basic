@@ -10,8 +10,13 @@ Jinja2==2.10;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
 Jinja2==2.11;python_version == '2.7' or python_version == '3.5'  # py27, py35
 Jinja2;python_version >= '3.6' # py36 and on
 
+# Cython is required to build PyYAML. To find out the supported versions check
+# https://github.com/cython/cython/issues/2800
+Cython
+
 PyYAML==5.2;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
-PyYAML<5.4;python_version == '2.7' or python_version >= '3.5'  # all else
+PyYAML<5.4;python_version == '2.7' or python_version <= '3.6'  # xenial and bionic
+PyYAML<7.0.0;python_version >= '3.7'  # >= focal
 
 MarkupSafe<2.0.0;python_version < '3.6'
 MarkupSafe<2.1.0;python_version == '3.6' # Just for python 3.6
