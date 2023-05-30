@@ -18,6 +18,8 @@ PyYAML==5.2;python_version >= '3.0' and python_version <= '3.4' # py3 trusty
 PyYAML<5.4;python_version == '2.7' or python_version <= '3.6'  # xenial and bionic
 PyYAML<7.0.0;python_version >= '3.7'  # >= focal
 
+pyaml<23.0.0  # See http://pad.lv/2020788
+
 MarkupSafe<2.0.0;python_version < '3.6'
 MarkupSafe<2.1.0;python_version == '3.6' # Just for python 3.6
 MarkupSafe;python_version >= '3.7' # newer pythons
