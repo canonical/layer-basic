@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        juju: ["3/stable", 2.9/stable]
+        juju: ["3/stable", 3.1/stable]
     timeout-minutes: 360
     steps:
       - name: Check out code
