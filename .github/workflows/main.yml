@@ -74,4 +74,14 @@ jobs:
         if: ${{ always() }}
         run: |
           model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
-          juju debug-log -m "$model" --replay --no-tail --level ERROR
+          mkdir tmp
+          juju debug-log -m "$model" --replay --no-tail --level ERROR | tee tmp/juju-debug-log.txt
+          juju status 2>&1 | tee tmp/juju-status.txt
+          juju-crashdump -s -m controller -a debug-layer -a config -o tmp/
+          juju-crashdump -s -m $model -a debug-layer -a config -o tmp/
+      - name: Upload debug artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-run-artifacts-${{matrix.python}}
+          path: tmp
