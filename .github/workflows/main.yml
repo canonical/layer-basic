@@ -10,9 +10,9 @@ jobs:
         python: [3.8, 3.9, "3.10"]
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
@@ -28,9 +28,9 @@ jobs:
         python: [3.5, 3.6, 3.7]
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
@@ -41,19 +41,28 @@ jobs:
   functional-test:
     name: Functional test with LXD
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        juju: ["3", "2.9"]
     timeout-minutes: 360
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
+      - name: Constrain Tox Environment for juju 2.9
+        if: ${{ matrix.juju == '2.9' }}
+        run: |
+          echo "TEST_CONSTRAINTS_FILE=constraints-juju29.txt" >> $GITHUB_ENV
       - name: Install Dependencies
         run: |
           pip install tox
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
+        with:
+          juju-channel: ${{ matrix.juju }}/stable
       - name: Run test
         run: tox -e func
       - name: Show Status
@@ -65,4 +74,14 @@ jobs:
         if: ${{ always() }}
         run: |
           model=$(juju models --format yaml|grep "^- name:.*zaza"|cut -f2 -d/);
-          juju debug-log -m "$model" --replay --no-tail --level ERROR
+          mkdir tmp
+          juju debug-log -m "$model" --replay --no-tail --level ERROR | tee tmp/juju-debug-log.txt
+          juju status 2>&1 | tee tmp/juju-status.txt
+          juju-crashdump -s -m controller -a debug-layer -a config -o tmp/
+          juju-crashdump -s -m $model -a debug-layer -a config -o tmp/
+      - name: Upload debug artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-run-artifacts-juju-${{ matrix.juju }}
+          path: tmp

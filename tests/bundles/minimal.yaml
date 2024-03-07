@@ -15,11 +15,11 @@ applications:
     #num_units: 1
   minimal-focal:
     series: focal
-    charm: /tmp/charm-builds/minimal
+    charm: ../../minimal.charm
     num_units: 1
   minimal-binary-wheels-focal:
     series: focal
-    charm: /tmp/charm-builds/minimal-binary-wheels
+    charm: ../../minimal-binary-wheels.charm
     num_units: 1
   #minimal-no-venv-trusty:
     #series: trusty
@@ -35,5 +35,5 @@ applications:
     #num_units: 1
   minimal-no-venv-focal:
     series: focal
-    charm: /tmp/charm-builds/minimal-no-venv
+    charm: ../../minimal-no-venv.charm
     num_units: 1
