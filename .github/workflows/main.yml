@@ -10,9 +10,9 @@ jobs:
         python: [3.8, 3.9, "3.10"]
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
@@ -28,9 +28,9 @@ jobs:
         python: [3.5, 3.6, 3.7]
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
@@ -47,9 +47,9 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
       - name: Constrain Tox Environment for juju 2.9
@@ -83,5 +83,5 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-run-artifacts-${{matrix.python}}
+          name: test-run-artifacts-${{ matrix.juju }}
           path: tmp
