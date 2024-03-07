@@ -41,6 +41,9 @@ jobs:
   functional-test:
     name: Functional test with LXD
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        juju: ["3/stable", 2.9/stable]
     timeout-minutes: 360
     steps:
       - name: Check out code
@@ -54,6 +57,8 @@ jobs:
           pip install tox
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
+        with:
+          juju-channel: ${{ matrix.juju }}
       - name: Run test
         run: tox -e func
       - name: Show Status
