@@ -26,7 +26,8 @@ MarkupSafe<2.2.0;python_version >= '3.7' # newer pythons
 
 setuptools<42;python_version < '3.8'
 # https://github.com/juju-solutions/layer-basic/issues/201
-setuptools<62.2.0;python_version >= '3.8'
+setuptools<62.2.0;python_version >= '3.8' and python_version<'3.12'
+setuptools>=62.2.0;python_version >= '3.12'
 setuptools-scm<=1.17.0;python_version < '3.8'
 # https://github.com/pypa/setuptools_scm/issues/722
 setuptools-scm<7;python_version >= '3.8'
