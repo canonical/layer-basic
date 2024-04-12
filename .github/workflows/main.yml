@@ -56,6 +56,11 @@ jobs:
         if: ${{ matrix.juju == '2.9' }}
         run: |
           echo "TEST_CONSTRAINTS_FILE=constraints-juju29.txt" >> $GITHUB_ENV
+      - name: Constrain Tox Environment for juju 3.x
+        if: ${{ matrix.juju == '3' }}
+        run: |
+          echo "TEST_JUJU3=1" >> $GITHUB_ENV
+          echo "TEST_CONSTRAINTS_FILE=constraints-juju3.txt" >> $GITHUB_ENV
       - name: Install Dependencies
         run: |
           pip install tox
