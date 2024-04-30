@@ -82,16 +82,14 @@ def bootstrap_charm_deps():
 
     series = get_series()
 
-    # OMG?! is build-essentials needed?
     ubuntu_packages = ['python3-pip',
                        'python3-setuptools',
+                       'python3-virtualenv',
                        'python3-yaml',
                        'python3-dev',
                        'python3-wheel',
                        'build-essential']
 
-    # I'm not going to "yum group info "Development Tools"
-    # omitting above madness
     centos_packages = ['python3-pip',
                        'python3-setuptools',
                        'python3-devel',
