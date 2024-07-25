@@ -45,3 +45,4 @@ netaddr<=0.7.19
 anyio<3.7.0;python_version >= '3.8' and python_version < '3.12'
 # sniffio is pulled in for anyio, it is not needed otherwise so make it match
 sniffio<1.3.1;python_version >= '3.8' and python_version < '3.12'  # 1.3.1 requires setuptools>=64
+immutables<0.16;python_version < '3.8' # >=0.16 requires setuptools>=42
