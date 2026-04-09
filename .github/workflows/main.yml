@@ -10,9 +10,9 @@ jobs:
         python: [3.8, 3.9, "3.10"]
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
@@ -28,9 +28,9 @@ jobs:
         python: [3.5, 3.6, 3.7]
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       env:
         PIP_TRUSTED_HOST: "pypi.python.org pypi.org files.pythonhosted.org"
       with:
@@ -49,9 +49,9 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: 3.8
       - name: Constrain Tox Environment for juju 2.9
@@ -67,7 +67,7 @@ jobs:
         run: |
           pip install tox
       - name: Setup operator environment
-        uses: charmed-kubernetes/actions-operator@main
+        uses: charmed-kubernetes/actions-operator@ea90ed489690bf3b1c1fcca6ac5f9edab70aecb0 # main
         with:
           juju-channel: ${{ matrix.juju }}/stable
       - name: Run test
@@ -88,7 +88,7 @@ jobs:
           juju-crashdump -s -m $model -a debug-layer -a config -o tmp/
       - name: Upload debug artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-run-artifacts-juju-${{ matrix.juju }}
           path: tmp
